@@ -1,0 +1,7 @@
+{
+  "name": "sustainaBite",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
