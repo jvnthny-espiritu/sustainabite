@@ -1,8 +1,9 @@
-# Hello World!
-Group example for git tutorial.
-This is an example repository for the git tutorial fot IT 331 Application Development and Emerging Technologies.
+# SustainaBite Mobile App
+SustainaBite is a community-driven mobile application designed to tackle food waste and promote food security. It connects individuals, restaurants, and grocery stores with surplus food to local community organizations and individuals in need.
 
-Enjoy!
+## Addresed SDG
+Goal 2 Zero Hunger
+End hunger,achieve food security and improved nutrition and promote sustainable agriculture.
 
 # Final Project
 ## Courses Involved
@@ -15,3 +16,4 @@ Enjoy!
 + Espiritu, Jave Anthony
 + Gonzales, China Mae
 + Labay, Caryll
++ Tomongha, Princess May
