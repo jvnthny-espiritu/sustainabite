@@ -1,9 +1,9 @@
-# SustainaBite Mobile App
-SustainaBite is a community-driven mobile application designed to tackle food waste and promote food security. It connects individuals, restaurants, and grocery stores with surplus food to local community organizations and individuals in need.
+# Sustain-A-Bite Mobile App
+Sustain-A-Bite is a community-driven mobile application designed to tackle food waste and promote food security. It connects individuals, restaurants, and grocery stores with surplus food to local community organizations and individuals in need.
 
 ## Addresed SDG
-Goal 2 Zero Hunger
-End hunger,achieve food security and improved nutrition and promote sustainable agriculture.
+Goal 2 Zero Hunger: 
+End hunger, achieve food security and improved nutrition and promote sustainable agriculture.
 
 # Final Project
 ## Courses Involved
