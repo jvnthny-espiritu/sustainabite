@@ -1,0 +1,37 @@
+ion-grid {
+	height: 100%;
+	max-height: 100vh;
+	padding: 0 3vw;
+}
+
+ion-input[fill="outline"] .input-wrapper {
+	--border-radius: 12px; 
+}
+
+.ion-valid[fill="outline"] .input-wrapper,
+.ion-invalid[fill="outline"] .input-wrapper,
+.ion-touched[fill="outline"] .input-wrapper {
+	--border-radius: 12px;
+}
+
+.footer-text {
+	text-align: center;
+	font-size: 2vh;
+  
+	a {
+	  text-decoration: none;
+	  font-weight: 600;
+	}
+}
+
+.back-button {
+	--background: transparent;
+	position: fixed;
+	left: 1vw;
+	top: 3vh;
+}
+
+ion-input[fill="outline"] .input-bottom {
+	color: black;
+
+}

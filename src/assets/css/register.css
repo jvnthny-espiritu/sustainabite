@@ -1,0 +1,29 @@
+.reg-grid {
+	height: 100%;
+	max-height: 100vh;
+	padding: 0 3vw;
+}
+
+.reg-title {
+	margin-top: 10vh;
+	margin-bottom: 1vh;
+	font-size: 4vh;
+	text-align: right;
+}
+
+.reg-subtitle {
+	margin-bottom: 5vh;
+	font-size: 3vh;
+	color: #939fab;
+	text-align: right;
+}
+
+.reg-input {
+	margin-top: 1vh;
+	margin-bottom: 2vh;
+}
+
+.reg-button {
+	margin-top: 20vh;
+	margin-bottom: 2vh;
+}

@@ -1,0 +1,67 @@
+.card {
+  border: 1px solid #095e37;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  border-radius: 10px;
+  margin-top:10px;
+  margin: 20px;
+  }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  }
+  
+.avatar {
+	width: 40px;
+	height: auto;
+  margin-right: 1rem;
+  }
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+
+  }
+  
+.user-name {
+  font-weight: bold;
+	font-size: 15px;
+  }
+  
+.post-time {
+  color: #666;
+	font-size: 11px;
+  }
+
+.message-button {
+	margin-left: auto;
+	border-style: none;
+	color: #095e37;
+	font-size: larger;
+  }
+
+.post-details {
+  margin-top: 10px; 
+  }
+
+.details-container {
+  background-color: transparent;
+  border:1px solid #095e37;
+  padding:0px;
+  padding-left:20px;
+  border-radius: 10px; 
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between; 
+  }
+  
+.details {
+  display: flex;
+  font-size:11px;
+  }
+
+.icon {
+  margin-right: 5px;
+  font-size: 15px;
+  }

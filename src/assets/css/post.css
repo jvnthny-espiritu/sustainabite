@@ -1,0 +1,24 @@
+.custom-file-upload {
+	cursor: pointer;
+	padding: 10px;
+	background-color: #004225;
+	color: white;
+	border-radius: 5px;
+	border: 1px solid #004225;
+	display: inline-block;
+  }
+
+  .photo-container {
+	display: flex;
+	justify-content: center; 
+	flex-wrap: wrap;
+	margin-top: 10px; 
+	overflow-y: auto
+  }
+  
+  .photo-thumbnail {
+	margin-right: 10px;
+	margin-bottom: 10px;
+	margin-top: 8px;
+	border: 1px solid #004225;
+  }

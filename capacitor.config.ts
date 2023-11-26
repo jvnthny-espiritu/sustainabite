@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'sustainaBite',
+  appName: 'sample-tab',
   webDir: 'dist',
   server: {
     androidScheme: 'https'

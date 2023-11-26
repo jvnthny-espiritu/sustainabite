@@ -1,0 +1,27 @@
+.filter-options {
+  margin-left: 18px;
+}
+
+.filter-button {
+  text-decoration: none;
+  border: 2px solid #095e37;
+  border-radius: 20px;
+  background-color: transparent;
+  cursor: pointer;
+  margin-right: 8px;
+}
+
+.filter-button.selected {
+  border-bottom: 3px solid #095e37;
+  background-color: #095e37;
+  color: white; 
+}
+
+.searchbar .searchbar-input {
+  border: 1px solid #095e37;
+  border-radius: 20px;
+}
+
+.recent-label {
+  font-weight: bold;
+}

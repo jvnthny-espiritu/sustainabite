@@ -1,0 +1,35 @@
+.container {
+	height: 100vh;
+}
+
+.container-1 {
+	height: 75%;
+}
+.container-2 {
+	height: 25%;
+}
+
+.image-container {
+	padding-top: 15vmax;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+.image-container img {
+	max-width: 250px;
+	max-height: 100vh;
+	object-fit: contain;
+}
+
+.text-tagline {
+	font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.text-tagline-1 {
+	font-size: 15px;
+	color: #43b14b;
+}
+
+.text-tagline-2 {
+	font-size: 10px;
+}
