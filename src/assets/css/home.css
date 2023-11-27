@@ -60,13 +60,13 @@ body {
     background-color: transparent;
     border:2px solid #095e37;
     padding:0px;
-    padding-left:50px;
+    padding-left:18px;
     border-radius: 10px; 
     overflow: hidden;
   }
   
   .details {
-    margin-right:100px; 
+    margin-right:3px; 
     font-size:13px;
   }
 
@@ -93,3 +93,9 @@ body {
     border-radius: 8px;
     vertical-align: top; 
   }
+
+.horizontal-scroll {
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+}
