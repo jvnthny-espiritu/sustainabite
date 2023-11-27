@@ -14,3 +14,4 @@ const app = initializeApp(config);
 
 export const auth = getAuth(app);
 export type firebaseUser = User;
+export { config }; 
