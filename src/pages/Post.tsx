@@ -68,7 +68,7 @@ const Post: React.FC = () => {
       title,
       location,
       description,
-      pickupTime: includePickupTime ? pickupTime : null,
+      pickupTime: includePickupTime ? pickupTime : 'None',
       selectedCategory,
       images: selectedPhotos,
       postedAt: new Date().toISOString(),
