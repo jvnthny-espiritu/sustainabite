@@ -7,51 +7,34 @@ import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import { formatDistanceToNow } from 'date-fns';
 
-// Specify the type for the Post object
-interface Post {
-  id: string;
-  title: string;
-  description: string;
-  pickupTime: string; // Add the pickupTime field if it's part of your data
-  location: string; // Add the location field if it's part of your data
-  selectedCategory: string; // Add the selectedCategory field if it's part of your data
-  images: string[];
-}
-
 const Home: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<{ id: string, postedAt: string }[]>([]);
+
 
   useEffect(() => {
     const postsRef = firebase.database().ref('posts');
-
+  
     const postsListener = postsRef.on('value', (snapshot) => {
       const postsData = snapshot.val();
-
+  
       if (postsData) {
-        const postsArray: Post[] = Object.entries(postsData).map(([postId, postData]: [string, any]) => ({
-          id: postId,
-          title: postData.title,
-          description: postData.description,
-          pickupTime: postData.pickupTime,
-          location: postData.location,
-          selectedCategory: postData.selectedCategory,
-          images: postData.images,
-          postedAt: postData.postedAt, // assuming there's a postedAt field in your data
+        // Convert the object of posts into an array
+        const postsArray = Object.keys(postsData).map((key) => ({
+          id: key,
+          ...postsData[key],
         }));
-
-        // Sort postsArray based on pickupTime in descending order
-        const sortedPosts = postsArray.sort((a, b) => new Date(b.pickupTime).getTime() - new Date(a.pickupTime).getTime());
-
+  
+        // Sort postsArray based on postedAt in descending order
+        const sortedPosts = postsArray.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+  
         setPosts(sortedPosts);
       } else {
         setPosts([]);
       }
     });
-
-    return () => {
-      postsRef.off('value', postsListener);
-    };
-  }, []);
+  
+    return () => postsRef.off('value', postsListener);
+  }, []); 
 
   return (
     <IonPage>
@@ -95,6 +78,7 @@ const Home: React.FC = () => {
             {post.images && post.images.length > 0 && (
             <div className="post-image-container">
               <div className="image-container">
+              <div className="horizontal-scroll">
                 {post.images.map((image: string, index: number) => (
                   <img
                     key={index}
@@ -104,6 +88,7 @@ const Home: React.FC = () => {
                   />
                 ))}
               </div>
+            </div>
             </div>
           )}
           </div>
