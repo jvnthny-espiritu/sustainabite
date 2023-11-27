@@ -1,9 +1,45 @@
-import { IonButton, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonTitle, IonToggle, IonToolbar } from '@ionic/react';
-import { trash } from 'ionicons/icons';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { useHistory } from 'react-router-dom';
 import '../assets/css/post.css';
+import { formatDistanceToNow } from 'date-fns';
+import {
+  IonButton,
+  IonCol,
+  IonContent,
+  IonGrid,
+  IonHeader,
+  IonIcon,
+  IonPage,
+  IonRow,
+  IonTitle,
+  IonToolbar,
+  IonInput,
+  IonItem,
+  IonLabel,
+  IonTextarea,
+  IonToggle,
+  IonSelect,
+  IonSelectOption,
+  IonImg,
+  IonThumbnail
+} from '@ionic/react';
+import { trash } from 'ionicons/icons';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/database';
+import 'firebase/compat/storage';
+import { config } from '../firebase';
+
+firebase.initializeApp(config);
+
+const storage = firebase.storage();
+const database = firebase.database();
+
+const calculateTimeDifference = (postedAt: string) => {
+  return formatDistanceToNow(new Date(postedAt), { addSuffix: true });
+};
 
 const Post: React.FC = () => {
+  const history = useHistory();
   const [images, setImages] = useState<FileList | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState('');
@@ -28,28 +64,45 @@ const Post: React.FC = () => {
 
 
   const handleSubmit = () => {
-    // Handle the submission of the food post data, including images, title, description, pickup time, and selected category.
-    if (images) {
-      console.log('Images:', images);
-    }
-    console.log('Title:', title);
-    console.log('Location:', location);
-    console.log('Description:', description);
-    console.log('Pickup Time:', pickupTime);
-    console.log('Selected Category:', selectedCategory);
+    const postData = {
+      title,
+      location,
+      description,
+      pickupTime: includePickupTime ? pickupTime : null,
+      selectedCategory,
+      images: selectedPhotos,
+      postedAt: new Date().toISOString(),
+    };
+  
+    const postsRef = database.ref('posts');
+    const newPostRef = postsRef.push();
+    newPostRef.set(postData);
+  
+    setImages(null);
+    setTitle('');
+    setLocation('');
+    setDescription('');
+    setPickupTime('');
+    setSelectedCategory('');
+    setIncludePickupTime(false);
+    setSelectedPhotos([]);
+  
+    history.push('/home');
+    history.push(`/home/${newPostRef.key}`);
   };
   
+
+  console.log('selectedPhotos:', selectedPhotos);
+  // Inside render method
+  console.log('selectedPhotos length:', selectedPhotos.length);
+
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle className="custom-text">Create Post</IonTitle>
-          <IonButton
-            className="custom-text"
-            fill="outline"
-            shape="round"
-            slot="end"
-            onClick={handleSubmit}>
+          <IonButton className="custom-text" fill="outline" shape="round" slot="end" onClick={handleSubmit}>
             Post
           </IonButton>
         </IonToolbar>
@@ -110,10 +163,10 @@ const Post: React.FC = () => {
                   placeholder="Select here"
                   onIonChange={(e) => setSelectedCategory(e.detail.value)}
                 >
-                  <IonSelectOption value="surplus">Surplus</IonSelectOption>
-                  <IonSelectOption value="donation">For Donation</IonSelectOption>
-                  <IonSelectOption value="expiry_soon">Expiry Soon</IonSelectOption>
-                  <IonSelectOption value="looking_for_food">Looking for Food</IonSelectOption>
+                  <IonSelectOption value="Surplus">Surplus</IonSelectOption>
+                  <IonSelectOption value="Donation">For Donation</IonSelectOption>
+                  <IonSelectOption value="Expiry soon">Expiry Soon</IonSelectOption>
+                  <IonSelectOption value="Looking for food">Looking for Food</IonSelectOption>
                 </IonSelect>
               </IonItem>
             </IonCol>
@@ -146,7 +199,7 @@ const Post: React.FC = () => {
             </IonCol>
           </IonRow>
           )}
-
+          
           <IonRow>
             <IonCol>
               <IonItem>
@@ -185,6 +238,9 @@ const Post: React.FC = () => {
               </IonCol>
             </IonRow>
           )}
+
+          
+
         </IonGrid>
       </IonContent>
     </IonPage>
