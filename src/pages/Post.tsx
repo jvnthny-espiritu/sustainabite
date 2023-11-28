@@ -1,32 +1,11 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import '../assets/css/post.css';
-import { formatDistanceToNow } from 'date-fns';
-import {
-  IonButton,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonHeader,
-  IonIcon,
-  IonPage,
-  IonRow,
-  IonTitle,
-  IonToolbar,
-  IonInput,
-  IonItem,
-  IonLabel,
-  IonTextarea,
-  IonToggle,
-  IonSelect,
-  IonSelectOption,
-  IonImg,
-  IonThumbnail
-} from '@ionic/react';
+import { IonButton, IonToolbar, IonTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonToggle } from '@ionic/react';
 import { trash } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import 'firebase/compat/storage';
+import '../assets/css/post.css';
 import { config } from '../firebase';
 
 firebase.initializeApp(config);
@@ -34,13 +13,8 @@ firebase.initializeApp(config);
 const storage = firebase.storage();
 const database = firebase.database();
 
-const calculateTimeDifference = (postedAt: string) => {
-  return formatDistanceToNow(new Date(postedAt), { addSuffix: true });
-};
-
 const Post: React.FC = () => {
   const history = useHistory();
-  const [images, setImages] = useState<FileList | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -49,10 +23,21 @@ const Post: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
 
-  const handleUploadPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      const files = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
-      setSelectedPhotos((prevPhotos) => [...prevPhotos, ...files]);
+      const files = Array.from(event.target.files);
+      const uploadPromises = files.map(async (file) => {
+        const imageRef = storage.ref().child(`images/${file.name}`);
+        await imageRef.put(file);
+        return imageRef.getDownloadURL();
+      });
+
+      try {
+        const downloadURLs = await Promise.all(uploadPromises);
+        setSelectedPhotos((prevPhotos) => [...prevPhotos, ...downloadURLs]);
+      } catch (error) {
+        console.error('Error uploading images:', error);
+      }
     }
   };
 
@@ -62,8 +47,7 @@ const Post: React.FC = () => {
     setSelectedPhotos(updatedPhotos);
   };
 
-
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const postData = {
       title,
       location,
@@ -73,28 +57,28 @@ const Post: React.FC = () => {
       images: selectedPhotos,
       postedAt: new Date().toISOString(),
     };
-  
-    const postsRef = database.ref('posts');
-    const newPostRef = postsRef.push();
-    newPostRef.set(postData);
-  
-    setImages(null);
-    setTitle('');
-    setLocation('');
-    setDescription('');
-    setPickupTime('');
-    setSelectedCategory('');
-    setIncludePickupTime(false);
-    setSelectedPhotos([]);
-  
-    history.push('/home');
-    history.push(`/home/${newPostRef.key}`);
+
+    try {
+      const postsRef = database.ref('posts');
+      const newPostRef = postsRef.push();
+      await newPostRef.set(postData);
+
+      setTitle('');
+      setLocation('');
+      setDescription('');
+      setPickupTime('');
+      setSelectedCategory('');
+      setIncludePickupTime(false);
+      setSelectedPhotos([]);
+
+      history.push('/home');
+      history.push(`/home/${newPostRef.key}`);
+    } catch (error) {
+      console.error('Error submitting post:', error);
+    }
   };
   
 
-  console.log('selectedPhotos:', selectedPhotos);
-  // Inside render method
-  console.log('selectedPhotos length:', selectedPhotos.length);
 
 
   return (
@@ -163,10 +147,10 @@ const Post: React.FC = () => {
                   placeholder="Select here"
                   onIonChange={(e) => setSelectedCategory(e.detail.value)}
                 >
-                  <IonSelectOption value="Surplus">Surplus</IonSelectOption>
-                  <IonSelectOption value="Donation">For Donation</IonSelectOption>
-                  <IonSelectOption value="Expiry soon">Expiry Soon</IonSelectOption>
-                  <IonSelectOption value="Looking for food">Looking for Food</IonSelectOption>
+                  <IonSelectOption value="Excess/Extra Food">Excess/Extra Food</IonSelectOption>
+                  <IonSelectOption value="Donation">Donation</IonSelectOption>
+                  <IonSelectOption value="Expiry Soon">Expiry Soon</IonSelectOption>
+                  <IonSelectOption value="Looking for Food">Looking for Food</IonSelectOption>
                 </IonSelect>
               </IonItem>
             </IonCol>
@@ -230,7 +214,7 @@ const Post: React.FC = () => {
                       onClick={() => handleDeletePhoto(index)}
                       className="photo-thumbnail"
                     >
-                      <IonImg src={photo} />
+                      <img src={photo} alt={`Image ${index}`} />
                       <IonIcon icon={trash} className="delete-icon" />
                     </IonThumbnail>
                   ))}
@@ -238,9 +222,6 @@ const Post: React.FC = () => {
               </IonCol>
             </IonRow>
           )}
-
-          
-
         </IonGrid>
       </IonContent>
     </IonPage>
