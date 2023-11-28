@@ -65,6 +65,7 @@ const App: React.FC = () => {
                   <Route exact path="/post"><Post /></Route>
                   <Route exact path="/messages"><Messages /></Route>
                   <Route exact path="/profile"><Profile /></Route>
+                  <Route path="/home/:postId" component={Home} />
                   <Redirect exact from="/" to="/home" />
                 </IonRouterOutlet>
 
