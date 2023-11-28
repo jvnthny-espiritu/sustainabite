@@ -3,6 +3,7 @@ import {IonButtons,IonCol,IonGrid,IonRow,IonMenu,IonMenuButton,IonButton,IonModa
 import {locationOutline, personOutline, createOutline, timeOutline,ellipsisVertical,menuSharp } from 'ionicons/icons'; // Import the settings icon
 import { OverlayEventDetail } from '@ionic/core/components';
 
+
 function Profile() {
   const modal = useRef<HTMLIonModalElement>(null);
   const input = useRef<HTMLIonInputElement>(null);
@@ -15,26 +16,53 @@ function Profile() {
   const [isValid, setIsValid] = useState<boolean>();
     
   const validateEmail = (email: string) => {
-  return email.match(/^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zAZ0-9-]{0,61}[a-zAZ0-9])?)*$/);};
+  return email.match(
+    /^(?=.{1,254}$)(?=.{1,64}@)[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zAZ0-9-]{0,61}[a-zAZ0-9])?)*$/
+  );
+  };
     
   const validate = (ev: Event) => {
     const value = (ev.target as HTMLInputElement).value;
     setIsValid(undefined);
-    if (value === '') return; 
-    validateEmail(value) !== null ? setIsValid(true) : setIsValid(false);};
     
-  const markTouched = () => {setIsTouched(true);}; 
-  const handleUsernameChange = (event: CustomEvent) => {setUsername(event.detail.value || '');};
-  const handleNameChange = (event: CustomEvent) => {setName(event.detail.value || '');};
-  const handleEmailChange = (event: CustomEvent) => {setEmail(event.detail.value || '');};
-  const handlePasswordChange = (event: CustomEvent) => {setPassword(event.detail.value || '');};
-  const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
+    if (value === '') return;
+    
+    validateEmail(value) !== null ? setIsValid(true) : setIsValid(false);
+  };
+    
+  const markTouched = () => {
+    setIsTouched(true);
+  };
+    
+  const handleUsernameChange = (event: CustomEvent) => {
+    setUsername(event.detail.value || '');
+  };
+    
+  const handleNameChange = (event: CustomEvent) => {
+    setName(event.detail.value || '');
+  };
+    
+  const handleEmailChange = (event: CustomEvent) => {
+    setEmail(event.detail.value || '');
+  };
+    
+  const handlePasswordChange = (event: CustomEvent) => {
+    setPassword(event.detail.value || '');
+  };
+
+  const [message, setMessage] = useState(
+    'This modal example uses triggers to automatically open a modal when the button is clicked.'
+  );
 
   function Save() {
-    modal.current?.dismiss(input.current?.value, 'confirm');}
+    modal.current?.dismiss(input.current?.value, 'confirm');
+  }
 
-  function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {if (ev.detail.role === 'confirm') {
-      setMessage(`Hello, ${ev.detail.data}!`);}}
+  function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
+    if (ev.detail.role === 'confirm') {
+      setMessage(`Hello, ${ev.detail.data}!`);
+    }
+  }
   
   const sampledata = [
     {
@@ -55,6 +83,7 @@ function Profile() {
     },
 
   ];
+
   return (
     <IonPage>
       <IonPage>
@@ -92,13 +121,15 @@ function Profile() {
               <p style={{ fontSize: 'default', margin: '0' }}>@username</p>
             </IonCol>
     </IonRow>
-    <div className='container'>
-        {sampledata.map((data, index) => (
+                  <div className='container'>
+        
+          {sampledata.map((data, index) => (
           <div className='card'  key={index}>
           <div className="post">
             <div className="user-info">
               <IonAvatar className="avatar">
-                <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg
+" />
               </IonAvatar>
               <div className="user-details">
                 <span className="user-name">{data.userName}</span>
@@ -116,19 +147,18 @@ function Profile() {
             <div className="post-details">
               <div className="details-container">
                 <p className='details'>
-                  <IonIcon icon={locationOutline} className='icon'/> {data.location} <span className='divider'>|</span>  
-                  <IonIcon icon={timeOutline} className='icon'/> Expiration Date: {data.expirationDate}</p>
+                  <IonIcon icon={locationOutline} className='icon'/> {data.location} <span className='divider'>|</span>  <IonIcon icon={timeOutline} className='icon'/> Expiration Date: {data.expirationDate}</p>
               </div>
             </div>
           </div>
           </div>
             ))}
-    </div>
-    </IonGrid>
-    </IonContent>
-    </IonPage>
-    <IonContent className="ion-padding">
-      <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
+            </div>
+                </IonGrid>
+              </IonContent>
+      </IonPage>
+      <IonContent className="ion-padding">
+        <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
         <IonHeader>
           <IonToolbar>
             <IonButtons slot="start">
@@ -158,19 +188,22 @@ function Profile() {
               </p>
             </IonCol>
           </IonRow>
+
           <IonRow>
-            <IonCol>
-              <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
-                <IonInput
-                label="Username"
-                labelPlacement="floating"
-                placeholder="Enter username"
-                type="text"
-                onIonChange={handleUsernameChange}
-                value={username}></IonInput>
-              </IonItem>
-            </IonCol>
-          </IonRow>
+  <IonCol>
+    <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
+      <IonInput
+        label="Username"
+        labelPlacement="floating"
+        placeholder="Enter username"
+        type="text"
+        onIonChange={handleUsernameChange}
+        value={username}
+      ></IonInput>
+    </IonItem>
+  </IonCol>
+</IonRow>
+
 <IonRow>
   <IonCol>
     <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>

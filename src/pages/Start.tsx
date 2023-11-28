@@ -4,8 +4,7 @@ import '../assets/css/start.css'
 
 const Start: React.FC = () => (
     <IonPage>
-      	<IonContent fullscreen className="ion-text-center" color={'primary'}>
-		<div className='container'>
+		<div className='start-container'>
 			<div className='container-1'>
 				<div className='image-container'>
 					<img src={logo} alt="Application Logo" className='application-logo' />
@@ -34,8 +33,7 @@ const Start: React.FC = () => (
 						Login
 					</IonButton>
 			</div>
-			</div>
-      	</IonContent>
+		</div>
     </IonPage> 
   );
 

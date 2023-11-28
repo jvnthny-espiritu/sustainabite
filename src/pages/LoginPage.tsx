@@ -50,7 +50,6 @@ const Login: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding'>
         <IonGrid class='login-grid'>
           <IonButton className="back-button" fill="clear" onClick={handleBack} size='small'>
             <IonIcon slot='start' icon={caretBack}/>
@@ -96,7 +95,6 @@ const Login: React.FC = () => {
             </IonCol>
           </IonRow>
         </IonGrid>
-      </IonContent>
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}

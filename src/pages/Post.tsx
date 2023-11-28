@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
-import { IonButton, IonToolbar, IonTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonToggle } from '@ionic/react';
+import { IonButton, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonImg, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonTitle, IonToggle, IonToolbar } from '@ionic/react';
 import { trash } from 'ionicons/icons';
-import firebase from 'firebase/compat/app';
-import 'firebase/compat/database';
-import 'firebase/compat/storage';
+import { useState } from 'react';
 import '../assets/css/post.css';
-import { config } from '../firebase';
-
-firebase.initializeApp(config);
-
-const storage = firebase.storage();
-const database = firebase.database();
 
 const Post: React.FC = () => {
-  const history = useHistory();
+  const [images, setImages] = useState<FileList | null>(null);
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -23,21 +13,10 @@ const Post: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
 
-  const handleUploadPhoto = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleUploadPhoto = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
-      const files = Array.from(event.target.files);
-      const uploadPromises = files.map(async (file) => {
-        const imageRef = storage.ref().child(`images/${file.name}`);
-        await imageRef.put(file);
-        return imageRef.getDownloadURL();
-      });
-
-      try {
-        const downloadURLs = await Promise.all(uploadPromises);
-        setSelectedPhotos((prevPhotos) => [...prevPhotos, ...downloadURLs]);
-      } catch (error) {
-        console.error('Error uploading images:', error);
-      }
+      const files = Array.from(event.target.files).map((file) => URL.createObjectURL(file));
+      setSelectedPhotos((prevPhotos) => [...prevPhotos, ...files]);
     }
   };
 
@@ -47,46 +26,30 @@ const Post: React.FC = () => {
     setSelectedPhotos(updatedPhotos);
   };
 
-  const handleSubmit = async () => {
-    const postData = {
-      title,
-      location,
-      description,
-      pickupTime: includePickupTime ? pickupTime : 'None',
-      selectedCategory,
-      images: selectedPhotos,
-      postedAt: new Date().toISOString(),
-    };
 
-    try {
-      const postsRef = database.ref('posts');
-      const newPostRef = postsRef.push();
-      await newPostRef.set(postData);
-
-      setTitle('');
-      setLocation('');
-      setDescription('');
-      setPickupTime('');
-      setSelectedCategory('');
-      setIncludePickupTime(false);
-      setSelectedPhotos([]);
-
-      history.push('/home');
-      history.push(`/home/${newPostRef.key}`);
-    } catch (error) {
-      console.error('Error submitting post:', error);
+  const handleSubmit = () => {
+    // Handle the submission of the food post data, including images, title, description, pickup time, and selected category.
+    if (images) {
+      console.log('Images:', images);
     }
+    console.log('Title:', title);
+    console.log('Location:', location);
+    console.log('Description:', description);
+    console.log('Pickup Time:', pickupTime);
+    console.log('Selected Category:', selectedCategory);
   };
   
-
-
-
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle className="custom-text">Create Post</IonTitle>
-          <IonButton className="custom-text" fill="outline" shape="round" slot="end" onClick={handleSubmit}>
+          <IonButton
+            className="custom-text"
+            fill="outline"
+            shape="round"
+            slot="end"
+            onClick={handleSubmit}>
             Post
           </IonButton>
         </IonToolbar>
@@ -147,10 +110,10 @@ const Post: React.FC = () => {
                   placeholder="Select here"
                   onIonChange={(e) => setSelectedCategory(e.detail.value)}
                 >
-                  <IonSelectOption value="Excess/Extra Food">Excess/Extra Food</IonSelectOption>
-                  <IonSelectOption value="Donation">Donation</IonSelectOption>
-                  <IonSelectOption value="Expiry Soon">Expiry Soon</IonSelectOption>
-                  <IonSelectOption value="Looking for Food">Looking for Food</IonSelectOption>
+                  <IonSelectOption value="surplus">Surplus</IonSelectOption>
+                  <IonSelectOption value="donation">For Donation</IonSelectOption>
+                  <IonSelectOption value="expiry_soon">Expiry Soon</IonSelectOption>
+                  <IonSelectOption value="looking_for_food">Looking for Food</IonSelectOption>
                 </IonSelect>
               </IonItem>
             </IonCol>
@@ -183,7 +146,7 @@ const Post: React.FC = () => {
             </IonCol>
           </IonRow>
           )}
-          
+
           <IonRow>
             <IonCol>
               <IonItem>
@@ -214,7 +177,7 @@ const Post: React.FC = () => {
                       onClick={() => handleDeletePhoto(index)}
                       className="photo-thumbnail"
                     >
-                      <img src={photo} alt={`Image ${index}`} />
+                      <IonImg src={photo} />
                       <IonIcon icon={trash} className="delete-icon" />
                     </IonThumbnail>
                   ))}

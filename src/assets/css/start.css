@@ -1,5 +1,8 @@
-.container {
+.start-container {
 	height: 100vh;
+	background-color: #004225;
+	display: flex;
+	flex-direction: column;
 }
 
 .container-1 {
@@ -23,6 +26,10 @@
 
 .text-tagline {
 	font-family: Verdana, Geneva, Tahoma, sans-serif;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 }
 
 .text-tagline-1 {
@@ -32,4 +39,5 @@
 
 .text-tagline-2 {
 	font-size: 10px;
+	color: white;
 }

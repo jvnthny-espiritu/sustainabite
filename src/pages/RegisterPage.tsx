@@ -3,11 +3,13 @@ import { caretBack } from 'ionicons/icons';
 import { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { collection, doc, setDoc, getFirestore } from 'firebase/firestore';
 import '../assets/css/register.css'
 import '../assets/css/form.css'
 
 const Register: React.FC = () => {
   const [fullName, setFullName] = useState('');
+  const [username, setUsername] = useState('');
   const [emailID, setEmailID] = useState('');
   const [password, setPassword] = useState('');
   const [isTouched, setIsTouched] = useState(false);
@@ -45,9 +47,21 @@ const Register: React.FC = () => {
     }
 
     const auth = getAuth();
+    const db = getFirestore();
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, emailID, password);
-      console.log('Registration Successful:', userCredential.user?.uid);
+      const { user } = userCredential;
+      const usersCollection = collection(db, 'users');
+      const userDoc = doc(usersCollection, user.uid); 
+      await setDoc(userDoc, {
+        id: user.uid,
+        name: fullName,
+        email: emailID,
+        username: username,
+        password: password
+      });
+      
+      console.log('Registration Successful:', user.uid);
       history.push('/login'); 
     } catch (error) {
       console.error('Registration Error:', error);
@@ -57,7 +71,6 @@ const Register: React.FC = () => {
 
   return (
     <IonPage>
-      <IonContent fullscreen className='ion-padding'>
         <IonGrid>
           <IonButton className="back-button" fill="clear" onClick={handleBack} size='small'>
             <IonIcon slot='start' icon={caretBack}/>
@@ -76,6 +89,14 @@ const Register: React.FC = () => {
               fill='outline'
               className='reg-input'
               onIonChange={(e: any) => setFullName(e.target.value)}>
+          </IonInput>
+          <IonInput
+              label="Username"
+              labelPlacement='floating'
+              type="text"
+              fill='outline'
+              className='reg-input'
+              onIonChange={(e: any) => setUsername(e.target.value)}>
           </IonInput>
           <IonInput
               className={`reg-input ${isValid && 'ion-valid'} ${isValid === false && 'ion-invalid'} ${isTouched && 'ion-touched'}`}
@@ -100,14 +121,14 @@ const Register: React.FC = () => {
               <IonButton 
                 expand="block" 
                 shape='round'
-                className="reg-button">
+                className="reg-button"
+                onClick={handleRegister}>
                 Create Account
               </IonButton>
               <p className='footer-text'>Already have an account? <a href="/login">Login</a></p>
             </IonCol>
           </IonRow>
         </IonGrid>
-      </IonContent>
       <IonToast
             isOpen={showToast}
             onDidDismiss={() => setShowToast(false)}
