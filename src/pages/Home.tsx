@@ -1,47 +1,57 @@
 import React, { useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow } from '@ionic/react';
+import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow, IonAvatar, IonButton, IonIcon } from '@ionic/react';
+import { locationOutline, timeOutline } from 'ionicons/icons';
 import logo from '../assets/img/app-logo.png';
 import '../assets/css/home.css';
-import PostCard from '../components/PostCard';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import 'firebase/compat/firestore';
+import { formatDistanceToNow } from 'date-fns';
+import { useIonViewDidEnter } from '@ionic/react';
+
+interface UserData {
+  username: string;
+  name: string;
+}
 
 const Home: React.FC = () => {
-  const sampledata = [
-    {
-      userName: 'Tristan Anyayahan',
-      postTime: '2 hours ago',
-      postTitle: 'Post Title 1',
-      postContent: 'Post Content 1 goes here...',
-      location: 'Batangas'
-    },
-    {
-      userName: 'Caryll Labay',
-      postTime: '3 hours ago',
-      postTitle: 'Post Title 2',
-      postContent: 'Post Content 2 goes here...',
-      location: 'Batangas'
-    },
-    {
-      userName: 'Princess May Tomongha',
-      postTime: '4 hours ago',
-      postTitle: 'Post Title 3',
-      postContent: 'Post Content 3 goes here...',
-      location: 'Batangas'
-    },
-    {
-      userName: 'Jave Anthony Espiritu',
-      postTime: '5 hours ago',
-      postTitle: 'Post Title 4',
-      postContent: 'Post Content 4 goes here...',
-      location: 'Batangas'
-    },
-    {
-      userName: 'Fiona Wanda Cueto',
-      postTime: '6 hours ago',
-      postTitle: 'Post Title 5',
-      postContent: 'Post Content 5 goes here...',
-      location: 'Batangas'
-    }
-  ];
+  const [posts, setPosts] = useState<{ id: string; postedAt: string; userId: string }[]>([]);
+  const [users, setUsers] = useState<{ [key: string]: UserData }>({});
+
+  useIonViewDidEnter(() => {
+    const postsRef = firebase.firestore().collection('posts');
+    const usersRef = firebase.firestore().collection('users');
+  
+    // Fetch posts
+    const postsListener = postsRef.onSnapshot((snapshot) => {
+      const postsData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        userId: doc.data().userId,
+        postedAt: doc.data().postedAt, // Make sure this matches your Firestore field name
+        ...doc.data(),
+      }));
+  
+      const sortedPosts = postsData.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
+  
+      setPosts(sortedPosts);
+    });
+  
+    // Fetch users
+    const usersListener = usersRef.onSnapshot((snapshot) => {
+      const usersData: { [key: string]: UserData } = {};
+      snapshot.forEach((doc) => {
+        usersData[doc.id] = doc.data() as UserData;
+      });
+      setUsers(usersData);
+    });
+  
+    // Cleanup function
+    return () => {
+      // Unsubscribe from Firestore listeners
+      postsListener(); // Unsubscribe from posts listener
+      usersListener(); // Unsubscribe from users listener
+    };
+  });
 
   return (
     <IonPage>
@@ -56,11 +66,50 @@ const Home: React.FC = () => {
       </IonHeader>
       <IonContent>
         <main>
-          <div className="container">
-            {sampledata.map((data, index) => (
-              <PostCard key={index} data={data} />
-            ))}
-          </div>
+          {posts.map((post: any) => (
+            <div key={post.id} className="post">
+              <div className="user-info">
+                <IonAvatar className="avatar">
+                  <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                </IonAvatar>
+                <div className="user-details">
+                  <span className="user-name">{users[post.userId]?.username || 'Unknown User'}</span>
+                  <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time'}</span>
+                </div>
+                <IonButton fill="clear" className="message-button">
+                  Message
+                </IonButton>
+              </div>
+              <div className="post-content">
+                <h3>{post.title}</h3>
+                <p>{post.description}</p>
+                <p>Category: {post.selectedCategory}</p>
+              </div>
+              <div className="post-details">
+                <div className="details-container">
+                  <p className='details'>
+                    <IonIcon icon={locationOutline} className='icon'/>{post.location} <IonIcon icon={timeOutline} className='icon'/> Expiration Date: {post.pickupTime}
+                  </p>
+                </div>
+              </div>
+              {post.images && post.images.length > 0 && (
+                <div className="post-image-container">
+                  <div className="image-container">
+                    <div className="horizontal-scroll">
+                      {post.images.map((image: string, index: number) => (
+                        <img
+                          key={index}
+                          src={image}
+                          alt={`Image ${index}`}
+                          className="post-image"
+                        />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </main>
       </IonContent>
     </IonPage>
