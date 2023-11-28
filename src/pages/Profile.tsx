@@ -1,6 +1,6 @@
 import  { useState, useRef} from 'react';
-import {IonButtons,IonCol,IonGrid,IonRow,IonMenu,IonMenuButton,IonButton,IonModal,IonHeader,IonContent,IonToolbar,IonTitle,IonPage,IonItem,IonInput,IonIcon,IonAvatar,} from '@ionic/react';
-import {locationOutline, personOutline, createOutline, timeOutline,ellipsisVertical,menuSharp } from 'ionicons/icons'; // Import the settings icon
+import {IonButtons,IonCol,IonGrid,IonRow,IonButton,IonModal,IonHeader,IonContent,IonToolbar,IonTitle,IonPage,IonItem,IonInput,IonIcon,IonAvatar,} from '@ionic/react';
+import {locationOutline, personOutline, createOutline, timeOutline,ellipsisVertical,logOutOutline } from 'ionicons/icons'; // Import the settings icon
 import { OverlayEventDetail } from '@ionic/core/components';
 
 
@@ -29,41 +29,32 @@ function Profile() {
     
     validateEmail(value) !== null ? setIsValid(true) : setIsValid(false);
   };
-    
   const markTouched = () => {
     setIsTouched(true);
   };
-    
   const handleUsernameChange = (event: CustomEvent) => {
     setUsername(event.detail.value || '');
   };
-    
   const handleNameChange = (event: CustomEvent) => {
     setName(event.detail.value || '');
   };
-    
   const handleEmailChange = (event: CustomEvent) => {
     setEmail(event.detail.value || '');
-  };
-    
+  }; 
   const handlePasswordChange = (event: CustomEvent) => {
     setPassword(event.detail.value || '');
   };
-
   const [message, setMessage] = useState(
     'This modal example uses triggers to automatically open a modal when the button is clicked.'
   );
-
   function Save() {
     modal.current?.dismiss(input.current?.value, 'confirm');
   }
-
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
       setMessage(`Hello, ${ev.detail.data}!`);
     }
   }
-  
   const sampledata = [
     {
       userName: 'Name',
@@ -81,9 +72,7 @@ function Profile() {
       location: 'Batangas',
       expirationDate: '12/31/2023'
     },
-
   ];
-
   return (
     <IonPage>
       <IonPage>
@@ -98,7 +87,7 @@ function Profile() {
           <IonButtons slot="end">
             <IonToolbar>
               <IonButton>
-            <IonIcon icon={menuSharp} size="large"/>
+            <IonIcon icon={logOutOutline} size="large"/>
             </IonButton>
           </IonToolbar>
           </IonButtons>
@@ -188,24 +177,22 @@ function Profile() {
               </p>
             </IonCol>
           </IonRow>
-
           <IonRow>
-  <IonCol>
-    <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
-      <IonInput
-        label="Username"
-        labelPlacement="floating"
-        placeholder="Enter username"
-        type="text"
-        onIonChange={handleUsernameChange}
-        value={username}
-      ></IonInput>
-    </IonItem>
-  </IonCol>
-</IonRow>
-
-<IonRow>
-  <IonCol>
+            <IonCol>
+              <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
+                <IonInput
+                label="Username"
+                labelPlacement="floating"
+                placeholder="Enter username"
+                type="text"
+                onIonChange={handleUsernameChange}
+                value={username}>
+                </IonInput>
+              </IonItem>
+            </IonCol>
+          </IonRow>
+ <IonRow>
+   <IonCol>
     <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
       <IonInput
         label="Name"
@@ -218,7 +205,6 @@ function Profile() {
     </IonItem>
   </IonCol>
 </IonRow>
-
 <IonRow>
   <IonCol>
     <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
@@ -236,7 +222,6 @@ function Profile() {
     </IonItem>
   </IonCol>
 </IonRow>
-
 <IonRow>
   <IonCol>
     <IonItem style={{ border: '1px solid #ccc', borderRadius: '8px' }}>
@@ -251,12 +236,6 @@ function Profile() {
     </IonItem>
   </IonCol>
 </IonRow>
-
-
-          <IonRow>
-            <IonCol class="centered-content">
-            </IonCol>
-          </IonRow>
         </IonGrid>
       </IonContent>
         </IonModal>
