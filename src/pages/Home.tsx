@@ -1,40 +1,39 @@
-import React, { useEffect, useState } from 'react';
-import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow, IonCol, IonAvatar, IonButton, IonIcon } from '@ionic/react';
+import React, { useState } from 'react';
+import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow, IonAvatar, IonButton, IonIcon } from '@ionic/react';
 import { locationOutline, timeOutline } from 'ionicons/icons';
 import logo from '../assets/img/app-logo.png';
 import '../assets/css/home.css';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/database';
 import { formatDistanceToNow } from 'date-fns';
+import { useIonViewDidEnter } from '@ionic/react';
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<{ id: string, postedAt: string }[]>([]);
 
-
-  useEffect(() => {
+  useIonViewDidEnter(() => {
     const postsRef = firebase.database().ref('posts');
-  
+
     const postsListener = postsRef.on('value', (snapshot) => {
       const postsData = snapshot.val();
-  
+
       if (postsData) {
-        // Convert the object of posts into an array
         const postsArray = Object.keys(postsData).map((key) => ({
           id: key,
           ...postsData[key],
         }));
-  
-        // Sort postsArray based on postedAt in descending order
+
         const sortedPosts = postsArray.sort((a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime());
-  
+
         setPosts(sortedPosts);
       } else {
         setPosts([]);
       }
     });
-  
+
     return () => postsRef.off('value', postsListener);
-  }, []); 
+  });
+  
 
   return (
     <IonPage>
@@ -48,6 +47,7 @@ const Home: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
+
       <main>
         {posts.map((post: any) => (
           <div key={post.id} className="post">
