@@ -1,5 +1,6 @@
 .login-grid {
 	padding: 0;
+	margin: 0 30px;
 }
 
 .login-title {
@@ -10,10 +11,10 @@
   }
 
 .login-subtitle {
-margin-bottom: 5vh;
-font-size: 3vh;
-color: #939fab;
-text-align: left;
+	margin-bottom: 5vh;
+	font-size: 3vh;
+	color: #939fab;
+	text-align: left;
 }
 
 .login-button {

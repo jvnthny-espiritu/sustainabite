@@ -15,23 +15,21 @@ const Start: React.FC = () => (
 				</div>
 			</div>
 			<div className='container-2'>
-					<IonButton 
-						routerLink='/register' 
-						className='ion-margin'
-						expand="block"
-						color={'tertiary'}
-						shape='round'>
-						Create an account
-					</IonButton>
-					<IonButton 
-						routerLink='/login' 
-						className='ion-margin'
-						expand="block" 
-						fill="outline"
-						color={'tertiary'}
-						shape='round'>
-						Login
-					</IonButton>
+				<IonButton 
+					routerLink='/register' 
+					expand="block"
+					color={'tertiary'}
+					shape='round'>
+					Create an account
+				</IonButton>
+				<IonButton 
+					routerLink='/login' 
+					expand="block" 
+					fill="outline"
+					color={'tertiary'}
+					shape='round'>
+					Login
+				</IonButton>
 			</div>
 		</div>
     </IonPage> 

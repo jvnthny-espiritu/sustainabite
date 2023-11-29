@@ -7,6 +7,7 @@ interface PostCardProps {
   data: {
     userName: string;
     postTime: string;
+    category: string;
     postTitle: string;
     postContent: string;
     location: string;
@@ -16,7 +17,7 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({ data }) => (
   <div className="card">
     <div className="post">
-      <UserCard userName={data.userName} postTime={data.postTime} />
+      <UserCard userName={data.userName} postTime={data.postTime} category={data.category}/>
       <div className="post-content">
         <h3>{data.postTitle}</h3>
         <p>{data.postContent}</p>
