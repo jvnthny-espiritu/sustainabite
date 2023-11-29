@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Search from './pages/Search';
 import Post from './pages/Post';
 import Messages from './pages/Messages';
+import Chat from './pages/Chat';
 import Profile from './pages/Profile';
 import Login from './pages/LoginPage';
 import Register from './pages/RegisterPage';
@@ -65,6 +66,7 @@ const App: React.FC = () => {
                   <Route exact path="/post"><Post /></Route>
                   <Route exact path="/messages"><Messages /></Route>
                   <Route exact path="/profile"><Profile /></Route>
+                  <Route path="/messages/:recipient" component={Chat} />
                   <Route path="/home/:postId" component={Home} />
                   <Redirect exact from="/" to="/home" />
                 </IonRouterOutlet>
