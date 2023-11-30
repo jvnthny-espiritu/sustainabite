@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow, IonAvatar, IonButton, IonIcon } from '@ionic/react';
 import { locationOutline, timeOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import logo from '../assets/img/app-logo.png';
 import '../assets/css/home.css';
 import firebase from 'firebase/compat/app';
@@ -15,6 +16,7 @@ interface UserData {
 }
 
 const Home: React.FC = () => {
+  const history = useHistory();
   const [posts, setPosts] = useState<{ id: string; postedAt: string; userId: string }[]>([]);
   const [users, setUsers] = useState<{ [key: string]: UserData }>({});
 
@@ -53,6 +55,10 @@ const Home: React.FC = () => {
     };
   });
 
+  const navigateToChat = (recipient: string) => {
+    history.push(`/messages/${recipient}`);
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -76,7 +82,7 @@ const Home: React.FC = () => {
                   <span className="user-name">{users[post.userId]?.username || 'Unknown User'}</span>
                   <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time'}</span>
                 </div>
-                <IonButton fill="clear" className="message-button">
+                <IonButton fill="clear" className="message-button" onClick={() => navigateToChat(users[post.userId]?.username)}>
                   Message
                 </IonButton>
               </div>

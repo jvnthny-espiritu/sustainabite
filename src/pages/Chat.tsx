@@ -3,7 +3,7 @@ import { personCircle } from "ionicons/icons";
 import { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { send, arrowBack } from 'ionicons/icons';
-import { collection, query, onSnapshot, doc, addDoc, serverTimestamp, FieldValue, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, onSnapshot, doc, addDoc, setDoc, getDoc, serverTimestamp, FieldValue, where, orderBy, getDocs } from "firebase/firestore";
 import '../assets/css/messages.css';
 import { db } from '../firebase';
 
@@ -17,7 +17,7 @@ const Chat: React.FC = () => {
   const [messages, setMessages] = useState<{ text: string; isUser: string; timestamp: any }[]>([]);
   const [myMap, setMyMap] = useState<Map<any, any>>(new Map());
 
-  // read data
+  // read text messages
   useEffect(() => {
     const chats = query(collection(db, "messages"), where('ref', 'in', [messageID1, messageID2]), orderBy('timestamp', 'asc'));
     const unsubscribe = onSnapshot(chats, (querySnapshot) => {
@@ -31,31 +31,49 @@ const Chat: React.FC = () => {
           isUser: data.isUser,
           timestamp: data.timestamp,
         };
-  
         newMessages.push(message);
         newMyMap.set(doc.id, message);
       });
   
       setMessages(newMessages);
       setMyMap(newMyMap);
+      return () => unsubscribe();
     });
   
-    return () => {
-      unsubscribe();
-    };
+    
   }, []);
 
-  // add data
+  // add text messages
   const addMessage = async () => {
     if (inputValue.trim() !== '') {
-      await addDoc(collection(db, "messages"), {
-        ref: messageID1,
-        text: inputValue,
-        isUser: userID,
-        timestamp: serverTimestamp(),
-      });
-      setInputValue('');
+      try {
+        const newMessageRef = await addDoc(collection(db, "messages"), {
+          ref: messageID1,
+          text: inputValue,
+          isUser: userID,
+          timestamp: serverTimestamp(),
+        });
+
+        // Use a separate query to fetch the data of the newly created document
+        const newMessageSnapshot = await getDoc(newMessageRef);
+        const { text } = newMessageSnapshot.data() as { text: string };
+
+        contactList(text);
+
+        setInputValue('');
+      } catch (error) {
+        console.error('Error adding message:', error);
+      }
     }
+  };
+
+  // add to contact list
+  const contactList = async (lastMessage: string) => {
+    await setDoc(doc(db, "contacts", recipient), {
+      username: recipient,
+      lastMessage: lastMessage,
+      timestamp: serverTimestamp(),
+    });
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
