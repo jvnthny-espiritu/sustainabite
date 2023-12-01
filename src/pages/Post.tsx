@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
-import { IonButton, IonToolbar, IonTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonToggle, IonToast } from '@ionic/react';
+import { IonButton, IonToolbar, IonTitle, IonCol, IonContent, IonGrid, IonHeader, IonIcon, IonInput, IonItem, IonLabel, IonPage, IonRow, IonSelect, IonSelectOption, IonTextarea, IonThumbnail, IonToggle, IonToast,IonAlert } from '@ionic/react';
 import { trash } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
@@ -26,6 +26,7 @@ const Post: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
   const [showToast, setShowToast] = useState(false);
+  const [showMissingFieldsModal, setShowMissingFieldsModal] = useState(false);
 
   useEffect(() => {
     const auth = getAuth();
@@ -67,6 +68,14 @@ const Post: React.FC = () => {
       return;
     }
 
+    // Check if required fields are empty
+    if (!title || !location || !description || !selectedCategory) {
+      console.error('Please fill in all required fields');
+      // Show a modal to inform the user about missing information
+      setShowMissingFieldsModal(true);
+      return;
+    }
+  
     const postData = {
       userId: user.uid,
       title,
@@ -77,13 +86,14 @@ const Post: React.FC = () => {
       images: selectedPhotos,
       postedAt: new Date().toISOString(),
     };
-
+  
     try {
       const postsRef = collection(getFirestore(), 'posts');
       const newPostDoc = doc(postsRef);
-
+  
       await setDoc(newPostDoc, postData);
-
+  
+      // Reset form fields after successful submission
       setTitle('');
       setLocation('');
       setDescription('');
@@ -91,17 +101,28 @@ const Post: React.FC = () => {
       setSelectedCategory('');
       setIncludePickupTime(false);
       setSelectedPhotos([]);
-
+  
       history.push('/home');
       history.push(`/home/${newPostDoc.id}`);
     } catch (error) {
       console.error('Error submitting post:', error);
     }
   };
+  
 
 
   return (
     <IonPage>
+
+      <IonAlert
+        isOpen={showMissingFieldsModal}
+        onDidDismiss={() => setShowMissingFieldsModal(false)}
+        header="Missing Fields"
+        message="Please fill in all required fields (Title, Location, Description, and Category)."
+        buttons={['OK']}
+      />
+
+
       <IonToast
         isOpen={showToast}
         onDidDismiss={() => setShowToast(false)}
