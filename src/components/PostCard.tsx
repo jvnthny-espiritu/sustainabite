@@ -3,6 +3,10 @@ import UserCard from './UserCard';
 import PostDetails from './PostDetails';
 import '../assets/css/card.css';
 
+import Slider from 'react-slick';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
+
 interface PostCardProps {
   data: {
     userName: string;
@@ -11,6 +15,7 @@ interface PostCardProps {
     postTitle: string;
     postContent: string;
     location: string;
+    images?: string[]; 
   };
 }
 
@@ -23,6 +28,22 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => (
         <p>{data.postContent}</p>
       </div>
       <PostDetails location={data.location} />
+      {data.images && data.images.length > 0 && (
+        <div className="post-image-container">
+          <div className="image-container">
+            <div className="horizontal-scroll">
+              {data.images.map((image: string, index: number) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Image ${index}`}
+                  className="post-image"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   </div>
 );
