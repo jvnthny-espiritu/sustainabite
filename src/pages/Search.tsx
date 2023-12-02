@@ -7,7 +7,6 @@ import 'firebase/compat/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { useHistory } from 'react-router-dom';
 import '../assets/css/search.css';
-import '../assets/css/home.css';
 
 interface Post {
   id: string;
@@ -64,10 +63,10 @@ const handleClearSearch = (index: number, event: React.MouseEvent): void => {
   }
 };
 
-  const handleRecentSearchClick = (searchTerm: string): void => {
+const handleRecentSearchClick = (searchTerm: string): void => {
     setSearchTerm(searchTerm);
     handleSearch(); 
-  };
+};
 
   const fetchDataFromFirebase = async (searchTerm: string, selectedFilter: string | null) => {
     try {
@@ -116,7 +115,7 @@ const handleClearSearch = (index: number, event: React.MouseEvent): void => {
       console.error('Error fetching data from Firebase:', error);
       return []; 
     }
-  }; //
+  };
   const filterContainerRef = useRef<HTMLDivElement>(null);
   const handleFilterClick = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
     setSelectedFilter(filter);
@@ -221,9 +220,9 @@ useEffect(() => {
         )}
 
         {searchResults.length > 0 && (
-          <IonList>
+          <div className = "">
             {searchResults.map((post) => (
-              <IonItem key={post.id} className="post">
+              <div key={post.id} className="post">
                 <div className="user-info">
                   <IonAvatar className="avatar">
                     <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
@@ -262,9 +261,9 @@ useEffect(() => {
                     </div>
                   </div>
                 )}
-              </IonItem>
+              </div>
             ))}
-          </IonList>
+          </div>
         )}
 
         {searchResults.length === 0 && searchTerm.trim() !== '' && (
