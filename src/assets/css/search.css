@@ -1,5 +1,21 @@
 .filter-options {
-  margin-left: 18px;
+  display: flex;
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch; 
+  margin-bottom: 10px;
+}
+
+.filter-options::-webkit-scrollbar {
+  width: 10px; 
+}
+
+.filter-options::-webkit-scrollbar-thumb {
+  background-color: transparent; 
+}
+
+.filter-options::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 
 .filter-button {
@@ -9,6 +25,8 @@
   background-color: transparent;
   cursor: pointer;
   margin-right: 8px;
+  margin-bottom: 10px; 
+  white-space: nowrap;
 }
 
 .filter-button.selected {
@@ -24,4 +42,11 @@
 
 .recent-label {
   font-weight: bold;
+}
+
+.recent-searches {
+  margin-top: -10px; 
+}
+.post {
+  margin-top: -5px; 
 }
