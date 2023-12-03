@@ -22,7 +22,6 @@ const Post: React.FC = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [pickupTime, setPickupTime] = useState('');
-  const [includePickupTime, setIncludePickupTime] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -81,7 +80,6 @@ const Post: React.FC = () => {
       title,
       location,
       description,
-      pickupTime: includePickupTime ? pickupTime : 'None',
       selectedCategory,
       images: selectedPhotos,
       postedAt: new Date().toISOString(),
@@ -99,7 +97,6 @@ const Post: React.FC = () => {
       setDescription('');
       setPickupTime('');
       setSelectedCategory('');
-      setIncludePickupTime(false);
       setSelectedPhotos([]);
   
       history.push('/home');
@@ -205,34 +202,6 @@ const Post: React.FC = () => {
             </IonCol>
           </IonRow>
 
-          <IonRow>
-            <IonCol>
-              <IonItem>
-                <IonLabel>Pickup Time</IonLabel>
-                <IonToggle
-                  checked={includePickupTime}
-                  onIonChange={() => setIncludePickupTime(!includePickupTime)}
-                />
-              </IonItem>
-            </IonCol>
-          </IonRow>
-
-          {includePickupTime && (
-            <IonRow>
-            <IonCol>
-              <IonItem className="custom-item">
-                <IonLabel className="custom-label">Date & Time</IonLabel>
-                <input
-                  type="datetime-local"
-                  value={pickupTime}
-                  onChange={(e) => setPickupTime(e.target.value)}
-                  className="custom-input"
-                />
-              </IonItem>
-            </IonCol>
-          </IonRow>
-          )}
-          
           <IonRow>
             <IonCol>
               <IonItem>
