@@ -31,7 +31,6 @@ interface PostData {
   description: string;
   selectedCategory: string;
   location: string;
-  pickupTime: string;
   images: string[];
 }
 
@@ -86,7 +85,6 @@ function Profile() {
               description: doc.data().description,
               selectedCategory: doc.data().selectedCategory,
               location: doc.data().location,
-              pickupTime: doc.data().pickupTime,
               images: doc.data().images || [],
             }));
 
@@ -247,7 +245,7 @@ function Profile() {
                   <div className="post-details">
                     <div className="details-container">
                       <p className='details'>
-                        <IonIcon icon={locationOutline} className='icon' /> {post.location} <span className='divider'>|</span> <IonIcon icon={timeOutline} className='icon' /> Expiration Date: {post.pickupTime}
+                        <IonIcon icon={locationOutline} className='icon' /> {post.location} <span className='divider'></span> 
                       </p>
                     </div>
                   </div>
