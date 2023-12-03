@@ -1,31 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {IonButton,IonButtons,IonCol,IonAvatar,IonContent,IonGrid,IonHeader,IonIcon,IonItem,IonLabel,IonList,IonPage,IonSearchbar,IonToolbar} from '@ionic/react';
+import { IonButton, IonButtons, IonCol, IonAvatar, IonContent, IonGrid, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonSearchbar, IonToolbar } from '@ionic/react';
 import { locationOutline, timeOutline } from 'ionicons/icons';
 import { close } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { useHistory } from 'react-router-dom';
+import PostCard from '../components/PostCard';
 import '../assets/css/search.css';
 
 interface Post {
   id: string;
   title: string;
   description: string;
-  pickupTime: string;
   location: string;
   selectedCategory: string;
   images: string[];
-  userName: string;
+  name: string;
   userId: string;
-  postedAt:string;
+  postedAt: string;
 }
 
 interface UserData {
   username: string;
   name: string;
 }
-
 
 const Search: React.FC = () => {
   const history = useHistory();
@@ -36,70 +35,62 @@ const Search: React.FC = () => {
   const [searchResults, setSearchResults] = useState<Post[]>([]);
   const [users, setUsers] = useState<{ [key: string]: UserData }>({});
   const filterOptions: ('All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food')[] = ['All', 'Excess/Extra Food', 'Donation', 'Expiry Soon', 'Looking for Food'];
+  const filterContainerRef = useRef<HTMLDivElement>(null);
 
-  // Function to handle search
   const handleSearch = async (): Promise<void> => {
     if (searchTerm.trim() !== '') {
-      const updatedSearches = [searchTerm, ...recentSearches];
-      if (updatedSearches.length > 5) {
-        updatedSearches.pop();
-      }
+      const updatedSearches = [searchTerm, ...recentSearches].slice(0, 5);
       setRecentSearches(updatedSearches);
       setSelectedFilter('All');
-
       fetchDataFromFirebase(searchTerm, 'All');
     }
   };
 
-const handleClearSearch = (index: number, event: React.MouseEvent): void => {
-  event.stopPropagation(); 
+  const handleClearSearch = (index: number, event: React.MouseEvent): void => {
+    event.stopPropagation();
+    const deletedSearch = recentSearches[index];
+    setRecentSearches((prevSearches) => prevSearches.filter((_, i) => i !== index));
+    if (searchTerm === deletedSearch) {
+      setSearchTerm('');
+      fetchDataFromFirebase('', selectedFilter);
+    }
+  };
 
-  const updatedSearches = [...recentSearches];
-  const deletedSearch = updatedSearches.splice(index, 1)[0];
-  setRecentSearches(updatedSearches);
-  if (searchTerm === deletedSearch) {
-    setSearchTerm('');
-    fetchDataFromFirebase('', selectedFilter); 
-  }
-};
-
-const handleRecentSearchClick = (searchTerm: string): void => {
+  const handleRecentSearchClick = (searchTerm: string): void => {
     setSearchTerm(searchTerm);
-    handleSearch(); 
-};
+    handleSearch();
+  };
+
+  const handleFilterClick = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
+    setSelectedFilter(filter);
+    handleFilterScroll(filter);
+    fetchDataFromFirebase(searchTerm, filter).then((filteredPosts) => setSearchResults(filteredPosts)).catch((error) => console.error('Error fetching filtered data:', error));
+  };
+
+  const handleFilterScroll = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
+    if (filterContainerRef.current) {
+      const index = filterOptions.indexOf(filter);
+      const scrollPosition = index * 100; // Assuming each tab has a fixed width of 100px
+      filterContainerRef.current.scrollLeft = scrollPosition;
+    }
+  };
 
   const fetchDataFromFirebase = async (searchTerm: string, selectedFilter: string | null) => {
     try {
       const postsRef = firebase.firestore().collection('posts');
       const usersRef = firebase.firestore().collection('users');
-
       const snapshot = await postsRef.get();
-
-      const postsData = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Post[];
+      const postsData = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })) as Post[];
 
       const filteredPosts = postsData.filter((post) => {
-        const lowercaseSearchTerm = searchTerm.toLowerCase();
+        const lowercasedTerm = searchTerm.toLowerCase();
+        const searchTermMatch = (field: string) => field.toLowerCase().includes(lowercasedTerm);
 
         if (selectedFilter && selectedFilter !== 'All') {
-          const searchTermMatch =
-            post.description.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.title.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.location.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.selectedCategory.toLowerCase().includes(lowercaseSearchTerm);
-
           const filterMatch = post.selectedCategory.toLowerCase() === selectedFilter.toLowerCase();
-
-          return searchTermMatch && filterMatch;
+          return searchTermMatch(post.description) || searchTermMatch(post.title) || searchTermMatch(post.location) || searchTermMatch(post.selectedCategory) && filterMatch;
         } else {
-          return (
-            post.description.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.title.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.location.toLowerCase().includes(lowercaseSearchTerm) ||
-            post.selectedCategory.toLowerCase().includes(lowercaseSearchTerm)
-          );
+          return searchTermMatch(post.description) || searchTermMatch(post.title) || searchTermMatch(post.location) || searchTermMatch(post.selectedCategory);
         }
       });
 
@@ -113,47 +104,27 @@ const handleRecentSearchClick = (searchTerm: string): void => {
       return filteredPosts;
     } catch (error) {
       console.error('Error fetching data from Firebase:', error);
-      return []; 
-    }
-  };
-  const filterContainerRef = useRef<HTMLDivElement>(null);
-  const handleFilterClick = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
-    setSelectedFilter(filter);
-    handleFilterScroll(filter);
-    fetchDataFromFirebase(searchTerm, filter)
-      .then((filteredPosts) => setSearchResults(filteredPosts))
-      .catch((error) => console.error('Error fetching filtered data:', error));
-  };
-
-  // Function to handle filter scroll
-  const handleFilterScroll = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
-    if (filterContainerRef.current) {
-      const index = filterOptions.indexOf(filter);
-      const scrollPosition = index * 100; // Assuming each tab has a fixed width of 100px
-      filterContainerRef.current.scrollLeft = scrollPosition;
+      return [];
     }
   };
 
-  // Effect hook to fetch initial data
- // Effect hook to fetch initial data
-useEffect(() => {
-  const fetchData = async () => {
-    if (searchTerm.trim() !== '') {
-      try {
-        setDataFetching(true);
-        const results = await fetchDataFromFirebase(searchTerm, selectedFilter);
-        setSearchResults(results);
-      } finally {
-        setDataFetching(false);
+  useEffect(() => {
+    const fetchData = async () => {
+      if (searchTerm.trim() !== '') {
+        try {
+          setDataFetching(true);
+          const results = await fetchDataFromFirebase(searchTerm, selectedFilter);
+          setSearchResults(results);
+        } finally {
+          setDataFetching(false);
+        }
+      } else {
+        setSearchResults([]);
       }
-    } else {
-      setSearchResults([]);
-    }
-  };
+    };
 
-  fetchData();
-}, [searchTerm, selectedFilter]);
-
+    fetchData();
+  }, [searchTerm, selectedFilter]);
 
   return (
     <IonPage>
@@ -205,13 +176,9 @@ useEffect(() => {
                 <IonItem key={index} onClick={() => handleRecentSearchClick(search)}>
                   <IonLabel>{search}</IonLabel>
                   <IonButtons slot="end">
-                  <IonButton
-                    fill="clear"
-                    size="small"
-                    onClick={(event) => handleClearSearch(index, event)}
-                  >
-                    <IonIcon icon={close} />
-                  </IonButton>
+                    <IonButton fill="clear" size="small" onClick={(event) => handleClearSearch(index, event)}>
+                      <IonIcon icon={close} />
+                    </IonButton>
                   </IonButtons>
                 </IonItem>
               ))}
@@ -220,48 +187,17 @@ useEffect(() => {
         )}
 
         {searchResults.length > 0 && (
-          <div className = "">
+          <div className="custom-list">
             {searchResults.map((post) => (
-              <div key={post.id} className="post">
-                <div className="user-info">
-                  <IonAvatar className="avatar">
-                    <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-                  </IonAvatar>
-                  <div className="user-details">
-                    <span className="user-name">{users[post.userId]?.username || 'Unknown User'}</span>
-                    <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time ago'}</span>
-                  </div>
-                  <IonButton
-                    fill="clear"
-                    className="message-button"
-                    onClick={() => history.push(`/messages/${users[post.userId]?.username}`)}
-                  >
-                    Message
-                  </IonButton>
-                </div>
-                <div className="post-content">
-                  <h3>{post.title}</h3>
-                  <p>{post.description}</p>
-                  <p>Category: {post.selectedCategory}</p>
-                </div>
-                <div className="post-details">
-                  <div className="details-container">
-                    <p className="details">
-                      <IonIcon icon={locationOutline} className="icon" />
-                      {post.location} <IonIcon icon={timeOutline} className="icon" /> Expiration Date: {post.pickupTime}
-                    </p>
-                  </div>
-                </div>
-                {post.images && post.images.length > 0 && (
-                  <div className="post-image-container">
-                    <div className="image-container">
-                      {post.images.map((image: string, index: number) => (
-                        <img key={index} src={image} alt={`Image ${index}`} className="post-image" />
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <PostCard key={post.id} data={{
+                userName: users[post.userId]?.username || 'Unknown User',
+                postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time ago',
+                category: post.selectedCategory,
+                postTitle: post.title,
+                postContent: post.description,
+                location: post.location,
+                images: post.images || [],
+              }} />
             ))}
           </div>
         )}
