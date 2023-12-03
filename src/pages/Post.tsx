@@ -21,7 +21,6 @@ const Post: React.FC = () => {
   const [selectedPhotos, setSelectedPhotos] = useState<string[]>([]);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [pickupTime, setPickupTime] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [location, setLocation] = useState('');
   const [showToast, setShowToast] = useState(false);
@@ -95,7 +94,6 @@ const Post: React.FC = () => {
       setTitle('');
       setLocation('');
       setDescription('');
-      setPickupTime('');
       setSelectedCategory('');
       setSelectedPhotos([]);
   
