@@ -2,16 +2,20 @@ import { IonCol, IonContent, IonGrid, IonIcon, IonItem, IonLabel, IonPage, IonRo
 import { personCircle } from "ionicons/icons";
 import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { collection, query, onSnapshot, orderBy } from "firebase/firestore";
+import { collection, query, onSnapshot, orderBy, where, or } from "firebase/firestore";
 import '../assets/css/messages.css';
 import { db } from '../firebase';
 
 const Message: React.FC = () => {
+  const userID = "Aether"; // changes based on user
   const [contactList, setcontactList] = useState<{ username: string; lastMessage: string }[]>([]);
   //const unreadNum = 4;
   const history = useHistory();
   const [searchText, setSearchText] = useState('');
-  const filteredData = contactList.filter(recipient => recipient.username.toLowerCase().includes(searchText.toLowerCase()));
+  const filteredData = contactList.filter(recipient => {
+    const username = recipient.username || 'User';
+    return username.toLowerCase().includes(searchText.toLowerCase());
+  });
 
   const handleButtonClick = (recipient: string) => {
     history.push(`/messages/${recipient}`);
@@ -19,13 +23,16 @@ const Message: React.FC = () => {
 
   // read data
   useEffect(() => {
-    const contacts = query(collection(db, "contacts"), orderBy('timestamp', 'desc'));
+    const contacts = query(collection(db, "contacts"), or(
+      where('usernameFrom', '==', userID),
+      where('usernameTo', '==', userID),
+      ), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(contacts, (querySnapshot) => {
       const newList: { username: string; lastMessage: string }[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const list = {
-          username: data.username,
+          username: data.usernameTo,
           lastMessage: data.lastMessage,
         };
         newList.push(list);
@@ -38,7 +45,8 @@ const Message: React.FC = () => {
     };
   }, []);
 
-  const renderRecipientList = (list: { username: string; lastMessage: string }[]) => (
+  const renderRecipientList = (list: { username: string; lastMessage: string }[]) => {
+    return (
     <IonList style={{ margin: "56px 0 0" }}>
       {list.map((recipient, index) => (
         <IonItem key={index} onClick={() => handleButtonClick(recipient.username)}>
@@ -64,8 +72,8 @@ const Message: React.FC = () => {
           </IonGrid>
         </IonItem>
       ))}
-    </IonList>
-  );
+    </IonList>);
+};
 
   return (
     <IonPage>
@@ -84,6 +92,7 @@ const Message: React.FC = () => {
         </IonToolbar>
 
         {searchText === '' ? renderRecipientList(contactList) : renderRecipientList(filteredData)}
+
       </IonContent>
     </IonPage>
   );

@@ -69,8 +69,9 @@ const Chat: React.FC = () => {
 
   // add to contact list
   const contactList = async (lastMessage: string) => {
-    await setDoc(doc(db, "contacts", recipient), {
-      username: recipient,
+    await setDoc(doc(db, "contacts", messageID1), {
+      usernameTo: recipient,
+      usernameFrom: userID,
       lastMessage: lastMessage,
       timestamp: serverTimestamp(),
     });
