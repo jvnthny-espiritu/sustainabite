@@ -3,13 +3,15 @@ import { personCircle } from "ionicons/icons";
 import { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { send, arrowBack } from 'ionicons/icons';
-import { collection, query, onSnapshot, doc, addDoc, setDoc, getDoc, serverTimestamp, FieldValue, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, onSnapshot, doc, addDoc, setDoc, getDoc, serverTimestamp, FieldValue, where, or, orderBy, getDocs } from "firebase/firestore";
 import '../assets/css/messages.css';
+import {useUsername } from '../services/getUsername';
 import { db } from '../firebase';
 
 const Chat: React.FC = () => {
   const history = useHistory();
-  const userID = "Aether"; // change based on user
+  const userID = useUsername(); // changes based on user
+  console.log("chat user", userID);
   const { recipient } = useParams<{ recipient: string }>(); //change based on recipient
   const messageID1 = userID + recipient;
   const messageID2 = recipient + userID;
@@ -19,7 +21,11 @@ const Chat: React.FC = () => {
 
   // read text messages
   useEffect(() => {
-    const chats = query(collection(db, "messages"), where('ref', 'in', [messageID1, messageID2]), orderBy('timestamp', 'asc'));
+    console.log("messageID1", messageID1);
+    const chats = query(collection(db, "messages"), or(
+      where('ref', '==', messageID1),
+      where('ref', '==', messageID2),
+      ), orderBy('timestamp', 'asc'));
     const unsubscribe = onSnapshot(chats, (querySnapshot) => {
       const newMessages: { text: string; isUser: string; timestamp: any }[] = [];
       const newMyMap = new Map<string, any>();
