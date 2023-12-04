@@ -176,7 +176,7 @@ function Profile() {
       setMessage(`Hello, ${ev.detail.data}!`);
     }
   }
-
+  
   return (
     <IonPage>
       <IonHeader>

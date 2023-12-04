@@ -4,13 +4,15 @@ import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { collection, query, onSnapshot, orderBy, where, or } from "firebase/firestore";
 import '../assets/css/messages.css';
+import {useUsername } from '../services/getUsername';
 import { db } from '../firebase';
 
 const Message: React.FC = () => {
-  const userID = "Aether"; // changes based on user
+  const history = useHistory();
+  const userID = useUsername(); // changes based on user
+  console.log("user", userID);
   const [contactList, setcontactList] = useState<{ username: string; lastMessage: string }[]>([]);
   //const unreadNum = 4;
-  const history = useHistory();
   const [searchText, setSearchText] = useState('');
   const filteredData = contactList.filter(recipient => {
     const username = recipient.username || 'User';
