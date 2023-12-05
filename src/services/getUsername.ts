@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 
-export const useUsername = (): string | null => {
+export const getUsername = (): string | null => {
   const [username, setUsername] = useState<string | null>(null);
 
   useEffect(() => {

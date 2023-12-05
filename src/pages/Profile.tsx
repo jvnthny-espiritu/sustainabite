@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useHistory } from 'react-router-dom';
 import {
   IonButtons,
   IonCol,
@@ -178,6 +179,19 @@ function Profile() {
     setPassword(event.detail.value || '');
   };
 
+  const history = useHistory();
+  const handleLogout = async () => {
+    try {
+      await firebase.auth().signOut();
+      console.log('naka log out ka na gago');
+      // Redirect to the start page after successful logout
+      history.push('/start'); // Update '/start' with the actual path of your start page
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+
   const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
 
   function Save() {
@@ -203,7 +217,7 @@ function Profile() {
           <IonTitle class="ion-text-center">My Profile</IonTitle>
           <IonButtons slot="end">
             <IonToolbar>
-              <IonButton>
+              <IonButton onClick={handleLogout} >
                 <IonIcon icon={logOutOutline} size="large" />
               </IonButton>
             </IonToolbar>

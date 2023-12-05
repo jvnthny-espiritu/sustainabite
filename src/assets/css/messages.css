@@ -29,7 +29,6 @@
     }
     
     .chat-bubble {
-    background-color: #004225;
     color: #ffffff;
     padding: 10px;
     border-radius: 10px;
@@ -38,9 +37,11 @@
     }
     
     .chat-user {
+    background-color: #004225;
     align-self: flex-end;
     }
     
     .chat-recipient {
+    background-color: #646464;
     align-self: flex-start;
     }
