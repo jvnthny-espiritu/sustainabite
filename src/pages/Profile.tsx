@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar, IonAlert } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
 import { locationOutline, personOutline, createOutline, timeOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
@@ -20,6 +21,7 @@ interface PostData {
 }
 
 function Profile() {
+  const history = useHistory();
   const modal = useRef<HTMLIonModalElement>(null);
   const input = useRef<HTMLIonInputElement>(null);
   const currentUser = firebase.auth().currentUser;
@@ -164,7 +166,7 @@ function Profile() {
     setPassword(event.detail.value || '');
   };
 
-  const history = useHistory();
+  
   const handleLogout = async () => {
     try {
       await firebase.auth().signOut();
