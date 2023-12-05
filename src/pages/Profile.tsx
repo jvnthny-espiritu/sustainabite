@@ -1,22 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useHistory } from 'react-router-dom';
-import {
-  IonButtons,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonRow,
-  IonButton,
-  IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonPage,
-  IonItem,
-  IonInput,
-  IonIcon,
-  IonAvatar,
-} from '@ionic/react';
+import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar, IonAlert } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
 import { locationOutline, personOutline, createOutline, timeOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
@@ -32,6 +15,7 @@ interface PostData {
   description: string;
   selectedCategory: string;
   location: string;
+  pickupTime: string;
   images: string[];
 }
 
@@ -86,6 +70,7 @@ function Profile() {
               description: doc.data().description,
               selectedCategory: doc.data().selectedCategory,
               location: doc.data().location,
+              pickupTime: doc.data().pickupTime,
               images: doc.data().images || [],
             }));
 
@@ -241,15 +226,37 @@ function Profile() {
                 <div className="post">
                   <div className="user-info">
                     <IonAvatar className="avatar">
-                      <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+                      <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg
+" />
                     </IonAvatar>
                     <div className="user-details">
                       <span className="user-name">{username || 'Unknown User'}</span>
                       <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time'}</span>
                     </div>
-                    <IonButton fill="clear" className="message-button">
+                    <IonButton fill="clear" className="message-button" id="present-alert">
                       <IonIcon icon={ellipsisVertical} />
                     </IonButton>
+                    <IonAlert
+        header="Delete"
+        trigger="present-alert"
+        buttons={[
+          {
+            text: 'Cancel',
+            role: 'cancel',
+            handler: () => {
+              console.log('canceled');
+            },
+          },
+          {
+            text: 'Confirm',
+            role: 'confirm',
+            handler: () => {
+              console.log('confirmed');
+            },
+          },
+        ]}
+        onDidDismiss={({ detail }) => console.log(`Dismissed with role: ${detail.role}`)}
+      ></IonAlert>
                   </div>
                   <div className="post-content">
                     <h3>{post.title}</h3>
@@ -259,7 +266,7 @@ function Profile() {
                   <div className="post-details">
                     <div className="details-container">
                       <p className='details'>
-                        <IonIcon icon={locationOutline} className='icon' /> {post.location} <span className='divider'></span> 
+                        <IonIcon icon={locationOutline} className='icon' /> {post.location} <span className='divider'>|</span> <IonIcon icon={timeOutline} className='icon' /> Expiration Date: {post.pickupTime}
                       </p>
                     </div>
                   </div>
