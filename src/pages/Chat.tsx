@@ -3,32 +3,54 @@ import { personCircle } from "ionicons/icons";
 import { useState, useEffect } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
 import { send, arrowBack } from 'ionicons/icons';
-import { collection, query, onSnapshot, doc, addDoc, setDoc, getDoc, serverTimestamp, FieldValue, where, orderBy, getDocs } from "firebase/firestore";
+import { collection, query, onSnapshot, doc, addDoc, setDoc, getDoc, serverTimestamp, FieldValue, where, or, orderBy, getDocs, updateDoc } from "firebase/firestore";
 import '../assets/css/messages.css';
+import {getUsername } from '../services/getUsername';
 import { db } from '../firebase';
 
 const Chat: React.FC = () => {
   const history = useHistory();
-  const userID = "Aether"; // change based on user
+  const user = getUsername(); // changes based on user
   const { recipient } = useParams<{ recipient: string }>(); //change based on recipient
-  const messageID1 = userID + recipient;
-  const messageID2 = recipient + userID;
+  let sender = '';
+  let reciever = '';
   const [inputValue, setInputValue] = useState<string>('');
-  const [messages, setMessages] = useState<{ text: string; isUser: string; timestamp: any }[]>([]);
+  const [messages, setMessages] = useState<{ text: string; sender: string; timestamp: any }[]>([]);
   const [myMap, setMyMap] = useState<Map<any, any>>(new Map());
+  const contactCollection = collection(db, 'contacts');
+  const [documentId, setdocumentId] = useState<string>('');
+
+  // read contact list
+  useEffect(() => {
+    const contacts = query(collection(db, "contacts"), or(
+      where('userFrom', '==', user),
+      where('userTo', '==', user),
+      ), orderBy('timestamp', 'desc'));
+    const unsubscribe = onSnapshot(contacts, (querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        sender = data.userFrom;
+        reciever = data.userTo;
+      });
+    });
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   // read text messages
   useEffect(() => {
-    const chats = query(collection(db, "messages"), where('ref', 'in', [messageID1, messageID2]), orderBy('timestamp', 'asc'));
+    console.log("documentId", documentId);
+    const chats = query(collection(db, "messages"), where('id', '==', documentId), orderBy('timestamp', 'asc'));
     const unsubscribe = onSnapshot(chats, (querySnapshot) => {
-      const newMessages: { text: string; isUser: string; timestamp: any }[] = [];
+      const newMessages: { text: string; sender: string; timestamp: any }[] = [];
       const newMyMap = new Map<string, any>();
-  
+
       querySnapshot.forEach((doc) => {
         const data = doc.data();
         const message = {
           text: data.text,
-          isUser: data.isUser,
+          sender: data.sender,
           timestamp: data.timestamp,
         };
         newMessages.push(message);
@@ -37,29 +59,25 @@ const Chat: React.FC = () => {
   
       setMessages(newMessages);
       setMyMap(newMyMap);
+      console.log("messages", messages);
       return () => unsubscribe();
     });
-  
-    
   }, []);
 
   // add text messages
   const addMessage = async () => {
     if (inputValue.trim() !== '') {
       try {
-        const newMessageRef = await addDoc(collection(db, "messages"), {
-          ref: messageID1,
+        const messagesCollection = collection(db, 'messages');
+        const documentId = await contactList(inputValue);
+  
+        await addDoc(messagesCollection, {
+          id: documentId,
           text: inputValue,
-          isUser: userID,
+          sender: user,
           timestamp: serverTimestamp(),
         });
-
-        // Use a separate query to fetch the data of the newly created document
-        const newMessageSnapshot = await getDoc(newMessageRef);
-        const { text } = newMessageSnapshot.data() as { text: string };
-
-        contactList(text);
-
+  
         setInputValue('');
       } catch (error) {
         console.error('Error adding message:', error);
@@ -68,13 +86,36 @@ const Chat: React.FC = () => {
   };
 
   // add to contact list
-  const contactList = async (lastMessage: string) => {
-    await setDoc(doc(db, "contacts", messageID1), {
-      usernameTo: recipient,
-      usernameFrom: userID,
-      lastMessage: lastMessage,
-      timestamp: serverTimestamp(),
-    });
+  const contactList = async (lastMessage: string): Promise<string> => {
+    const querySnapshot = await getDocs(
+      query(contactCollection,
+        or((where('userFrom', '==', user), where('userTo', '==', recipient)),
+           (where('userTo', '==', user), where('userFrom', '==', recipient))),
+      )
+    );
+  
+    if (querySnapshot.docs.length > 0) {
+      // If both user and recipient are found
+      const docRef = querySnapshot.docs[0].ref;
+      await updateDoc(docRef, {
+        lastMessage: lastMessage,
+        timestamp: serverTimestamp(),
+      });
+
+      setdocumentId(docRef.id);
+    } else {
+      // If not found, add a new document to the contact collection
+      const contactCollectionRef = await addDoc(contactCollection, {
+        userFrom: user,
+        userTo: recipient,
+        lastMessage: lastMessage,
+        timestamp: serverTimestamp(),
+      });
+      setdocumentId(contactCollectionRef.id);
+      await updateDoc(contactCollectionRef, { id: documentId });
+      console.log('Contact added successfully!');
+    }
+    return(documentId);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -106,7 +147,7 @@ const Chat: React.FC = () => {
         <div className='chat-container'>
           {messages.map((message, index) => {
             var isUserMessage: boolean;
-            if (message.isUser === userID) {
+            if (message.sender === user) {
               isUserMessage = true;
             } else {
               isUserMessage = false;

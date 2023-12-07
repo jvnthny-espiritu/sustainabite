@@ -4,13 +4,14 @@ import { useHistory } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { collection, query, onSnapshot, orderBy, where, or } from "firebase/firestore";
 import '../assets/css/messages.css';
+import {getUsername } from '../services/getUsername';
 import { db } from '../firebase';
 
 const Message: React.FC = () => {
-  const userID = "Aether"; // changes based on user
+  const history = useHistory();
+  const userID = getUsername(); // changes based on user\
   const [contactList, setcontactList] = useState<{ username: string; lastMessage: string }[]>([]);
   //const unreadNum = 4;
-  const history = useHistory();
   const [searchText, setSearchText] = useState('');
   const filteredData = contactList.filter(recipient => {
     const username = recipient.username || 'User';
@@ -20,21 +21,35 @@ const Message: React.FC = () => {
   const handleButtonClick = (recipient: string) => {
     history.push(`/messages/${recipient}`);
   };
-
+  
   // read data
   useEffect(() => {
     const contacts = query(collection(db, "contacts"), or(
-      where('usernameFrom', '==', userID),
-      where('usernameTo', '==', userID),
+      where('userFrom', '==', userID),
+      where('userTo', '==', userID),
       ), orderBy('timestamp', 'desc'));
     const unsubscribe = onSnapshot(contacts, (querySnapshot) => {
       const newList: { username: string; lastMessage: string }[] = [];
       querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const list = {
-          username: data.usernameTo,
-          lastMessage: data.lastMessage,
+        const user = userID;
+        const sender = data.userFrom;
+        const reciever = data.userTo;
+        let list = {
+          username: '',
+          lastMessage: '',
         };
+        if(user === reciever){
+          list = {
+            username: sender,
+            lastMessage: data.lastMessage,
+          };
+        } else if(user === sender){
+          list = {
+            username: reciever,
+            lastMessage: data.lastMessage,
+          };
+        }
         newList.push(list);
       });
       setcontactList(newList);

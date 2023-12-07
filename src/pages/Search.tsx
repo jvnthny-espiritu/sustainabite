@@ -30,19 +30,16 @@ const Search: React.FC = () => {
   const history = useHistory();
   const [searchTerm, setSearchTerm] = useState('');
   const [dataFetching, setDataFetching] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState<'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'>('All');
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const [searchResults, setSearchResults] = useState<Post[]>([]);
   const [users, setUsers] = useState<{ [key: string]: UserData }>({});
-  const filterOptions: ('All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food')[] = ['All', 'Excess/Extra Food', 'Donation', 'Expiry Soon', 'Looking for Food'];
-  const filterContainerRef = useRef<HTMLDivElement>(null);
 
+  // Function to handle search
   const handleSearch = async (): Promise<void> => {
     if (searchTerm.trim() !== '') {
       const updatedSearches = [searchTerm, ...recentSearches].slice(0, 5);
       setRecentSearches(updatedSearches);
-      setSelectedFilter('All');
-      fetchDataFromFirebase(searchTerm, 'All');
+      fetchDataFromFirebase(searchTerm).then((results) => setSearchResults(results)).catch((error) => console.error('Error fetching data:', error));
     }
   };
 
@@ -52,7 +49,7 @@ const Search: React.FC = () => {
     setRecentSearches((prevSearches) => prevSearches.filter((_, i) => i !== index));
     if (searchTerm === deletedSearch) {
       setSearchTerm('');
-      fetchDataFromFirebase('', selectedFilter);
+      fetchDataFromFirebase('');
     }
   };
 
@@ -61,21 +58,7 @@ const Search: React.FC = () => {
     handleSearch();
   };
 
-  const handleFilterClick = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
-    setSelectedFilter(filter);
-    handleFilterScroll(filter);
-    fetchDataFromFirebase(searchTerm, filter).then((filteredPosts) => setSearchResults(filteredPosts)).catch((error) => console.error('Error fetching filtered data:', error));
-  };
-
-  const handleFilterScroll = (filter: 'All' | 'Excess/Extra Food' | 'Donation' | 'Expiry Soon' | 'Looking for Food'): void => {
-    if (filterContainerRef.current) {
-      const index = filterOptions.indexOf(filter);
-      const scrollPosition = index * 100; // Assuming each tab has a fixed width of 100px
-      filterContainerRef.current.scrollLeft = scrollPosition;
-    }
-  };
-
-  const fetchDataFromFirebase = async (searchTerm: string, selectedFilter: string | null) => {
+  const fetchDataFromFirebase = async (searchTerm: string) => {
     try {
       const postsRef = firebase.firestore().collection('posts');
       const usersRef = firebase.firestore().collection('users');
@@ -86,12 +69,7 @@ const Search: React.FC = () => {
         const lowercasedTerm = searchTerm.toLowerCase();
         const searchTermMatch = (field: string) => field.toLowerCase().includes(lowercasedTerm);
 
-        if (selectedFilter && selectedFilter !== 'All') {
-          const filterMatch = post.selectedCategory.toLowerCase() === selectedFilter.toLowerCase();
-          return searchTermMatch(post.description) || searchTermMatch(post.title) || searchTermMatch(post.location) || searchTermMatch(post.selectedCategory) && filterMatch;
-        } else {
-          return searchTermMatch(post.description) || searchTermMatch(post.title) || searchTermMatch(post.location) || searchTermMatch(post.selectedCategory);
-        }
+        return searchTermMatch(post.description) || searchTermMatch(post.title) || searchTermMatch(post.location) || searchTermMatch(post.selectedCategory);
       });
 
       const usersSnapshot = await usersRef.get();
@@ -113,7 +91,7 @@ const Search: React.FC = () => {
       if (searchTerm.trim() !== '') {
         try {
           setDataFetching(true);
-          const results = await fetchDataFromFirebase(searchTerm, selectedFilter);
+          const results = await fetchDataFromFirebase(searchTerm);
           setSearchResults(results);
         } finally {
           setDataFetching(false);
@@ -124,7 +102,7 @@ const Search: React.FC = () => {
     };
 
     fetchData();
-  }, [searchTerm, selectedFilter]);
+  }, [searchTerm]);
 
   return (
     <IonPage>
@@ -152,71 +130,51 @@ const Search: React.FC = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent>
-        {searchTerm ? (
-          <div className="filter-options" ref={filterContainerRef}>
-            {filterOptions.map((filter, index) => (
-              <IonButton
-                key={index}
-                fill="clear"
-                size="small"
-                className={`filter-button ${selectedFilter === filter ? 'selected' : ''}`}
-                onClick={() => handleFilterClick(filter)}
-              >
-                {filter}
+  {searchTerm && (
+    <div className="custom-list">
+      {searchResults.length > 0 ? (
+        searchResults.map((post) => (
+          <PostCard key={post.id} data={{
+            userName: users[post.userId]?.username || 'Unknown User',
+            postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time ago',
+            category: post.selectedCategory,
+            postTitle: post.title,
+            postContent: post.description,
+            location: post.location,
+            images: post.images || [],
+          }} />
+        ))
+      ) : (
+        <IonList>
+          <IonItem>
+            <IonLabel>No results found for "{searchTerm}"</IonLabel>
+          </IonItem>
+        </IonList>
+      )}
+    </div>
+  )}
+
+  {!searchTerm && (
+    <div className="recent-searches">
+      <IonList>
+        <IonItem>
+          <IonLabel className="recent-label">Recent Searches</IonLabel>
+        </IonItem>
+        {recentSearches.map((search, index) => (
+          <IonItem key={index} onClick={() => handleRecentSearchClick(search)}>
+            <IonLabel>{search}</IonLabel>
+            <IonButtons slot="end">
+              <IonButton fill="clear" size="small" onClick={(event) => handleClearSearch(index, event)}>
+                <IonIcon icon={close} />
               </IonButton>
-            ))}
-          </div>
-        ) : (
-          <div className="recent-searches">
-            <IonList>
-              <IonItem>
-                <IonLabel className="recent-label">Recent Searches</IonLabel>
-              </IonItem>
-              {recentSearches.map((search, index) => (
-                <IonItem key={index} onClick={() => handleRecentSearchClick(search)}>
-                  <IonLabel>{search}</IonLabel>
-                  <IonButtons slot="end">
-                    <IonButton fill="clear" size="small" onClick={(event) => handleClearSearch(index, event)}>
-                      <IonIcon icon={close} />
-                    </IonButton>
-                  </IonButtons>
-                </IonItem>
-              ))}
-            </IonList>
-          </div>
-        )}
+            </IonButtons>
+          </IonItem>
+        ))}
+      </IonList>
+    </div>
+  )}
+</IonContent>
 
-        {searchResults.length > 0 && (
-          <div className="custom-list">
-            {searchResults.map((post) => (
-              <PostCard key={post.id} data={{
-                userName: users[post.userId]?.username || 'Unknown User',
-                postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time ago',
-                category: post.selectedCategory,
-                postTitle: post.title,
-                postContent: post.description,
-                location: post.location,
-                images: post.images || [],
-              }} />
-            ))}
-          </div>
-        )}
-
-        {searchResults.length === 0 && searchTerm.trim() !== '' && (
-          <IonList>
-            {selectedFilter !== 'All' && (
-              <IonItem>
-                <IonLabel>No results found for "{searchTerm}" in {selectedFilter.toLowerCase()}</IonLabel>
-              </IonItem>
-            )}
-            {selectedFilter === 'All' && (
-              <IonItem>
-                <IonLabel>No results found for "{searchTerm}"</IonLabel>
-              </IonItem>
-            )}
-          </IonList>
-        )}
-      </IonContent>
     </IonPage>
   );
 };

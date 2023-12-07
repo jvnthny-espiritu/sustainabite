@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar, IonAlert } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
 import { locationOutline, personOutline, createOutline, timeOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
+import { useHistory } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
@@ -26,6 +27,7 @@ interface UserData {
 }
 
 function Profile() {
+  const history = useHistory();
   const modal = useRef<HTMLIonModalElement>(null);
   const input = useRef<HTMLIonInputElement>(null);
   const currentUser = firebase.auth().currentUser;
@@ -177,6 +179,19 @@ function Profile() {
     setPassword(event.detail.value || '');
   };
 
+  
+  const handleLogout = async () => {
+    try {
+      await firebase.auth().signOut();
+      console.log('naka log out ka na gago');
+      // Redirect to the start page after successful logout
+      history.push('/start'); // Update '/start' with the actual path of your start page
+    } catch (error) {
+      console.error('Error logging out:', error);
+    }
+  };
+
+
   const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
 
   function Save() {
@@ -202,7 +217,7 @@ function Profile() {
           <IonTitle class="ion-text-center">My Profile</IonTitle>
           <IonButtons slot="end">
             <IonToolbar>
-              <IonButton>
+              <IonButton onClick={handleLogout} >
                 <IonIcon icon={logOutOutline} size="large" />
               </IonButton>
             </IonToolbar>
