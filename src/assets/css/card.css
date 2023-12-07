@@ -91,3 +91,28 @@
   overflow-x: auto;
   white-space: nowrap;
 }
+
+@media (prefers-color-scheme: light) {
+  .card {
+    border: 1px solid #004225;
+  }
+
+  .category {
+    color: #004225;
+    border: 2px solid #004225;
+  }
+
+  .message-button {
+    color: #004225;
+    }
+
+  .details-container {
+    border:1px solid #004225;
+    }
+
+
+  .post-image {
+    border: 2px solid #004225;
+  }
+
+}

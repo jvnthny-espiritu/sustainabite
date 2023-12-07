@@ -1,5 +1,5 @@
 import { IonButton, IonCol, IonContent, IonPage, IonRow } from '@ionic/react';
-import logo from '../assets/img/app-logo.png';
+import logo from '../assets/img/app-logo-dark.png';
 import '../assets/css/start.css'
 
 const Start: React.FC = () => (

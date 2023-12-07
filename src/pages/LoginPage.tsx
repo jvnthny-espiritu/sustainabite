@@ -15,7 +15,7 @@ const Login: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const history = useHistory();
 
-  const handleLogin =async () => {
+  const handleLogin = async () => {
     if (!validateEmail(emailID) || password.trim() === '') {
       console.error('Invalid email or password');
       setIsValid(false);

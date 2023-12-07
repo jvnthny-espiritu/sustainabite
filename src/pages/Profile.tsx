@@ -1,27 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import {
-  IonButtons,
-  IonCol,
-  IonContent,
-  IonGrid,
-  IonRow,
-  IonButton,
-  IonModal,
-  IonHeader,
-  IonToolbar,
-  IonTitle,
-  IonPage,
-  IonItem,
-  IonInput,
-  IonIcon,
-  IonAvatar,
-} from '@ionic/react';
+import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar, IonAlert } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
 import { locationOutline, personOutline, createOutline, timeOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import { OverlayEventDetail } from '@ionic/core/components';
+import PostCard from '../components/ProfilePostCard';
 
 interface PostData {
   id: string;
@@ -31,7 +16,13 @@ interface PostData {
   description: string;
   selectedCategory: string;
   location: string;
+  pickupTime: string;
   images: string[];
+}
+
+interface UserData {
+  username: string;
+  name: string;
 }
 
 function Profile() {
@@ -40,13 +31,20 @@ function Profile() {
   const currentUser = firebase.auth().currentUser;
 
   const [user, setUser] = useState<firebase.User | null>(null);
-  const [posts, setPosts] = useState<PostData[]>([]);
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isTouched, setIsTouched] = useState(false);
   const [isValid, setIsValid] = useState<boolean>();
+  const [posts, setPosts] = useState<{
+    selectedCategory: string;
+    title: string;
+    description: string;
+    location: string;
+    images: never[]; id: string; postedAt: string; userId: string 
+}[]>([]);
+  const [users, setUsers] = useState<{ [key: string]: UserData }>({});
 
   const [modalUsername, setModalUsername] = useState('');
   const [modalName, setModalName] = useState('');
@@ -85,6 +83,7 @@ function Profile() {
               description: doc.data().description,
               selectedCategory: doc.data().selectedCategory,
               location: doc.data().location,
+              pickupTime: doc.data().pickupTime,
               images: doc.data().images || [],
             }));
 
@@ -190,7 +189,7 @@ function Profile() {
       setMessage(`Hello, ${ev.detail.data}!`);
     }
   }
-
+  
   return (
     <IonPage>
       <IonHeader>
@@ -223,43 +222,17 @@ function Profile() {
           </IonRow>
           <div className='container'>
             {posts.map((post) => (
-              <div className='card' key={post.id}>
-                <div className="post">
-                  <div className="user-info">
-                    <IonAvatar className="avatar">
-                      <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-                    </IonAvatar>
-                    <div className="user-details">
-                      <span className="user-name">{username || 'Unknown User'}</span>
-                      <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time'}</span>
-                    </div>
-                    <IonButton fill="clear" className="message-button">
-                      <IonIcon icon={ellipsisVertical} />
-                    </IonButton>
-                  </div>
-                  <div className="post-content">
-                    <h3>{post.title}</h3>
-                    <p>{post.description}</p>
-                    <p>Category: {post.selectedCategory}</p>
-                  </div>
-                  <div className="post-details">
-                    <div className="details-container">
-                      <p className='details'>
-                        <IonIcon icon={locationOutline} className='icon' /> {post.location} <span className='divider'></span> 
-                      </p>
-                    </div>
-                  </div>
-                  {post.images && post.images.length > 0 && (
-                    <div className="image-container">
-                      <div className="horizontal-scroll">
-                        {post.images.map((image: string, index: number) => (
-                          <img key={index} src={image} alt={`Image ${index}`} className="post-image" />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <PostCard
+                key={post.id}
+                data={{
+                  userName: users[post.userId]?.username || 'Unknown User',
+                  postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time',
+                  category: post.selectedCategory,
+                  postTitle: post.title,
+                  postContent: post.description,
+                  location: post.location,
+                  images: post.images || [],
+                }} />
             ))}
           </div>
         </IonGrid>

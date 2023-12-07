@@ -6,7 +6,7 @@ import 'firebase/compat/firestore';
 import { formatDistanceToNow } from 'date-fns';
 import { useIonViewDidEnter } from '@ionic/react';
 import PostCard from '../components/PostCard';
-import logo from '../assets/img/app-logo.png';
+import logo from '../assets/img/app-logo-dark.png';
 import '../assets/css/home.css';
 
 interface UserData {
