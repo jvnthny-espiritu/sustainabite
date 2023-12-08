@@ -63,6 +63,14 @@ function Profile() {
     setEditPostId(postId);
   };
 
+  const handleDeletePost = async (postId: string) => {
+    try {
+      await firebase.firestore().collection('posts').doc(postId).delete();
+    } catch (error) {
+      console.error('Error deleting post:', error);
+    }
+  };
+
   const openModal = () => {
     modal.current?.present();
     setModalUsername(username);
@@ -70,6 +78,7 @@ function Profile() {
     setModalEmail(email);
     setModalPassword('');
   };
+
 
   useEffect(() => {
     const fetchUserDataAndPosts = async () => {
@@ -323,6 +332,7 @@ function Profile() {
                 images: post.images || [],
                 postId: post.id, 
                 onEditClick: handleEditPostClick, 
+                onDeleteClick:handleDeletePost,
               }} />
           ))}
         </div>
