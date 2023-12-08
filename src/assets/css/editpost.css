@@ -1,0 +1,69 @@
+.edit-post-modal {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  
+  .edit-post-modal-header {
+    text-align: center;
+  }
+  
+  .edit-post-modal-content {
+    flex-grow: 1;
+    padding: 16px;
+  }
+  
+  .edit-post-modal-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .edit-post-modal-label {
+    margin-bottom: 8px;
+  }
+  
+  .edit-post-modal-input {
+    margin-bottom: 16px;
+    padding: 8px;
+  }
+  
+  .edit-post-modal-textarea {
+    margin-bottom: 16px;
+    padding: 8px;
+  }
+  
+  .edit-post-modal-image-upload {
+    margin-bottom: 16px;
+  }
+  
+  .edit-post-modal-image-preview {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  
+  .edit-post-modal-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 8px;
+    margin-bottom: 8px;
+  }
+  
+  .edit-post-modal-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 16px;
+  }
+  
+  .edit-post-modal-save-btn {
+    flex: 1;
+    margin-left: 8px;
+    text-align: right;
+  }
+  
+  .edit-post-modal-cancel-btn {
+    flex: 1;
+    text-align: left;
+  }
+  
