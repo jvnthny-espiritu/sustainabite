@@ -1,28 +1,52 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { IonAvatar, IonButton, IonIcon, IonAlert } from '@ionic/react';
 import { ellipsisVertical } from 'ionicons/icons';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
 
 interface UserCardProps {
- userName: string;
- postTime: string;
- category: string;
+  userName: string;
+  postTime: string;
+  category: string;
 }
 
 const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category }) => {
- const [showOptions, setShowOptions] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
- const handleOptions = () => {
+  const handleOptions = () => {
     setShowOptions(true);
- };
+  };
 
- const handleDismiss = () => {
+  const handleDismiss = () => {
     setShowOptions(false);
- };
+  };
 
- return (
+  useEffect(() => {
+    const fetchProfilePhoto = async () => {
+      const currentUser = firebase.auth().currentUser;
+      if (currentUser) {
+        try {
+          const userDoc = await firebase.firestore().collection('users').doc(currentUser.uid).get();
+          const photoUrl = userDoc.data()?.profilePhotoUrl || null;
+          setProfilePhotoUrl(photoUrl);
+        } catch (error) {
+          console.error('Error fetching profile photo:', error);
+        }
+      }
+    };
+
+    fetchProfilePhoto();
+  }, []); // Empty dependency array to run the effect only once when the component mounts
+
+  return (
     <div className="user-info">
       <IonAvatar className="avatar">
-        <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+        {profilePhotoUrl ? (
+          <img alt="User's profile" src={profilePhotoUrl} />
+        ) : (
+          <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+        )}
       </IonAvatar>
       <div className="user-details">
         <span className="user-name">{userName}</span>
@@ -55,7 +79,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category }) => 
         ]}
       />
     </div>
- );
+  );
 };
 
 export default UserCard;
