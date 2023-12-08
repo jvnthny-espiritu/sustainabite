@@ -13,6 +13,7 @@ import logo from '../assets/img/app-logo-dark.png';
 import '../assets/css/home.css';
 
 interface UserData {
+  userID:string;
   username: string;
   name: string;
 }
@@ -78,6 +79,7 @@ const Home: React.FC = () => {
             <PostCard 
               key={post.id}
               data={{
+                userId: post.userId,
                 userName: users[post.userId]?.username || 'Unknown User',
                 postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown Time',
                 category: post.selectedCategory,
