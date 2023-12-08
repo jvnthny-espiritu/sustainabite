@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { IonAvatar, IonButton, IonIcon, IonAlert } from '@ionic/react';
+import { IonAvatar, IonButton, IonIcon, IonActionSheet } from '@ionic/react';
 import { ellipsisVertical } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
+import EditPostModal from './EditPost';
 
 interface UserCardProps {
   userName: string;
   postTime: string;
   category: string;
+  postId: string;
+  onEditClick: () => void; // Add this prop for the edit click handler
 }
 
-const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category }) => {
+const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEditClick }) => {
   const [showOptions, setShowOptions] = useState(false);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
@@ -39,6 +42,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category }) => 
     fetchProfilePhoto();
   }, []); // Empty dependency array to run the effect only once when the component mounts
 
+
   return (
     <div className="user-info">
       <IonAvatar className="avatar">
@@ -48,33 +52,42 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category }) => 
           <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
         )}
       </IonAvatar>
-      <div className="user-details">
-        <span className="user-name">{userName}</span>
-        <span className="post-time">{postTime}</span>
-        <span className='category'>{category}</span>
-      </div>
-      <IonButton fill="clear" className="message-button" onClick={handleOptions}>
+        <div className="user-details">
+          <span className="user-name">{userName}</span>
+          <span className="post-time">{postTime}</span>
+          <span className='category'>{category}</span>
+        </div>
+        <IonButton fill="clear" className="message-button" onClick={handleOptions}>
         <IonIcon aria-hidden="true" icon={ellipsisVertical} />
       </IonButton>
 
-      <IonAlert
+      <IonActionSheet
         isOpen={showOptions}
         onDidDismiss={handleDismiss}
         header="Options"
         buttons={[
           {
             text: 'Edit',
-            handler: () => { console.log('editing on process'); },
+            handler: () => {
+              onEditClick(); // Trigger the edit click handler
+              setShowOptions(false); // Close the action sheet
+            },
           },
           {
             text: 'Delete',
             role: 'destructive',
-            handler: () => { console.log('deleting on process'); },
+            handler: () => {
+              console.log('deleting on process');
+              setShowOptions(false); // Close the action sheet
+            },
           },
           {
             text: 'Cancel',
             role: 'cancel',
-            handler: () => { console.log('canceled'); },
+            handler: () => {
+              console.log('canceled');
+              setShowOptions(false); // Close the action sheet
+            },
           },
         ]}
       />
