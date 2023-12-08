@@ -9,20 +9,22 @@ import 'slick-carousel/slick/slick-theme.css';
 
 interface PostCardProps {
   data: {
+    userId: string; // Add userId to the data object
     userName: string;
     postTime: string;
     category: string;
     postTitle: string;
     postContent: string;
     location: string;
-    images?: string[]; 
+    images?: string[];
   };
 }
 
 const PostCard: React.FC<PostCardProps> = ({ data }) => (
   <div className="card">
     <div className="post">
-      <UserCard userName={data.userName} postTime={data.postTime} category={data.category}/>
+      {/* Pass userId to the UserCard component */}
+      <UserCard userId={data.userId} userName={data.userName} postTime={data.postTime} category={data.category} />
       <div className="post-content">
         <h3>{data.postTitle}</h3>
         <p>{data.postContent}</p>
@@ -33,12 +35,7 @@ const PostCard: React.FC<PostCardProps> = ({ data }) => (
           <div className="image-container">
             <div className="horizontal-scroll">
               {data.images.map((image: string, index: number) => (
-                <img
-                  key={index}
-                  src={image}
-                  alt={`Image ${index}`}
-                  className="post-image"
-                />
+                <img key={index} src={image} alt={`Image ${index}`} className="post-image" />
               ))}
             </div>
           </div>
