@@ -70,84 +70,69 @@ function Profile() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => {
-    const fetchUserPosts = async () => {
-      if (user) {
-        const postsRef = firebase.firestore().collection('posts');
-        const userPostsListener = postsRef
-          .where('userId', '==', user.uid)
-          .onSnapshot(async (snapshot) => {
-            const userPostsData = snapshot.docs.map((doc) => ({
-              id: doc.id,
-              userId: doc.data().userId,
-              postedAt: doc.data().postedAt,
-              title: doc.data().title,
-              description: doc.data().description,
-              selectedCategory: doc.data().selectedCategory,
-              location: doc.data().location,
-              pickupTime: doc.data().pickupTime,
-              images: doc.data().images || [],
-            }));
-
-            const sortedUserPosts = userPostsData.sort(
-              (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-            );
-
-            setPosts(sortedUserPosts);
-
-            const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-            const usernameFromFirestore = userDoc.data()?.username;
-
-            setUsername(usernameFromFirestore || 'Unknown User');
-          });
-
-        return () => {
-          userPostsListener();
-        };
-      }
-    };
-
-    fetchUserPosts();
-  }, [user]);
 
   useEffect(() => {
-    const fetchUserPosts = async () => {
+    const fetchUserDataAndPosts = async () => {
       if (user) {
-        const postsRef = firebase.firestore().collection('posts');
         try {
-          const postsSnapshot = await postsRef.where('userId', '==', user.uid).get();
-          const userPostsData = postsSnapshot.docs.map((doc) => ({
-            id: doc.id,
-            userId: doc.data().userId,
-            postedAt: doc.data().postedAt,
-            title: doc.data().title,
-            description: doc.data().description,
-            selectedCategory: doc.data().selectedCategory,
-            location: doc.data().location,
-            pickupTime: doc.data().pickupTime,
-            images: doc.data().images || [],
-          }));
+          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+          const usernameFromFirestore = userDoc.data()?.username;
+          const nameFromFirestore = userDoc.data()?.name;
   
-          const sortedUserPosts = userPostsData.sort(
-            (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
-          );
+          console.log('Username from Firestore:', usernameFromFirestore);
+          console.log('Name from Firestore:', nameFromFirestore);
   
-          const usersSnapshot = await firebase.firestore().collection('users').get();
-          const usersData: { [key: string]: UserData } = {};
-          usersSnapshot.docs.forEach((doc) => {
-            usersData[doc.id] = doc.data() as UserData;
-          });
+          setUsername(usernameFromFirestore || 'Unknown User');
+          setName(nameFromFirestore || 'Unknown Name');
   
-          setUsers(usersData);
-          setPosts(sortedUserPosts);
+          const postsRef = firebase.firestore().collection('posts');
+          const userPostsListener = postsRef
+            .where('userId', '==', user.uid)
+            .onSnapshot(async (snapshot) => {
+              const userPostsData = snapshot.docs.map((doc) => ({
+                id: doc.id,
+                userId: doc.data().userId,
+                postedAt: doc.data().postedAt,
+                title: doc.data().title,
+                description: doc.data().description,
+                selectedCategory: doc.data().selectedCategory,
+                location: doc.data().location,
+                pickupTime: doc.data().pickupTime,
+                images: doc.data().images || [],
+              }));
+  
+              const sortedUserPosts = userPostsData.sort(
+                (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+              );
+  
+              setPosts(sortedUserPosts);
+  
+              // Update the users state with the fetched user data
+              const usersSnapshot = await firebase.firestore().collection('users').get();
+              const usersData: { [key: string]: UserData } = {};
+              usersSnapshot.docs.forEach((doc) => {
+                usersData[doc.id] = doc.data() as UserData;
+              });
+  
+              setUsers(usersData);
+            });
+  
+          return () => {
+            userPostsListener();
+          };
         } catch (error) {
-          console.error('Error fetching user posts:', error);
+          console.error('Error fetching user data:', error);
         }
       }
     };
   
-    fetchUserPosts();
+    fetchUserDataAndPosts();
   }, [user]);
+  
+  
+  
+  
+  
   
 
   const validateEmail = (email: string) => {
