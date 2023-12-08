@@ -16,6 +16,7 @@ interface PostCardProps {
     images: never[];
     postId: string;
     onEditClick: (postId: string) => void;
+    onDeleteClick: (postId: string) => void;
   };
   children?: React.ReactNode; // Include the children prop
 }
@@ -24,7 +25,7 @@ interface PostCardProps {
 const PostCard: React.FC<PostCardProps> = ({ data }) =>  (
   <div className="card">
     <div className="post">
-      <UserCard userName={data.userName} postTime={data.postTime} category={data.category} postId={''} onEditClick={function (): void {
+      <UserCard userName={data.userName} postTime={data.postTime} category={data.category} postId={''} onEditClick={function () : void {
         throw new Error('Function not implemented.');
       } }/>
       <div className="post-content">
@@ -49,6 +50,7 @@ const PostCard: React.FC<PostCardProps> = ({ data }) =>  (
         </div>
       )}
       <IonButton onClick={() => data.onEditClick(data.postId)}>Edit</IonButton>
+      <IonButton onClick={() => data.onDeleteClick(data.postId)}>Delete</IonButton>
     </div>
   </div>
 );
