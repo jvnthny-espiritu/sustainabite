@@ -111,21 +111,44 @@ function Profile() {
   }, [user]);
 
   useEffect(() => {
-    const fetchUserData = async () => {
+    const fetchUserPosts = async () => {
       if (user) {
+        const postsRef = firebase.firestore().collection('posts');
         try {
-          const userDoc = await firebase.firestore().collection('users').doc(user.uid).get();
-          const nameFromFirestore = userDoc.data()?.name;
-
-          setName(nameFromFirestore || 'Unknown Name');
+          const postsSnapshot = await postsRef.where('userId', '==', user.uid).get();
+          const userPostsData = postsSnapshot.docs.map((doc) => ({
+            id: doc.id,
+            userId: doc.data().userId,
+            postedAt: doc.data().postedAt,
+            title: doc.data().title,
+            description: doc.data().description,
+            selectedCategory: doc.data().selectedCategory,
+            location: doc.data().location,
+            pickupTime: doc.data().pickupTime,
+            images: doc.data().images || [],
+          }));
+  
+          const sortedUserPosts = userPostsData.sort(
+            (a, b) => new Date(b.postedAt).getTime() - new Date(a.postedAt).getTime()
+          );
+  
+          const usersSnapshot = await firebase.firestore().collection('users').get();
+          const usersData: { [key: string]: UserData } = {};
+          usersSnapshot.docs.forEach((doc) => {
+            usersData[doc.id] = doc.data() as UserData;
+          });
+  
+          setUsers(usersData);
+          setPosts(sortedUserPosts);
         } catch (error) {
-          console.error('Error fetching user data:', error);
+          console.error('Error fetching user posts:', error);
         }
       }
     };
-
-    fetchUserData();
+  
+    fetchUserPosts();
   }, [user]);
+  
 
   const validateEmail = (email: string) => {
     return email.match(
