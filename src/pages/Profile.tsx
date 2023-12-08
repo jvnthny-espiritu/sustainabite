@@ -8,6 +8,8 @@ import 'firebase/compat/auth';
 import 'firebase/compat/firestore';
 import { OverlayEventDetail } from '@ionic/core/components';
 import PostCard from '../components/ProfilePostCard';
+import EditPostModal from '../components/EditPost';
+
 
 interface PostData {
   id: string;
@@ -34,7 +36,6 @@ function Profile() {
   const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
   
-
   const [user, setUser] = useState<firebase.User | null>(null);
   const [username, setUsername] = useState('');
   const [name, setName] = useState('');
@@ -55,6 +56,12 @@ function Profile() {
   const [modalName, setModalName] = useState('');
   const [modalEmail, setModalEmail] = useState('');
   const [modalPassword, setModalPassword] = useState('');
+
+  const [editPostId, setEditPostId] = useState<string | null>(null);
+
+  const handleEditPostClick = (postId: string) => {
+    setEditPostId(postId);
+  };
 
   const openModal = () => {
     modal.current?.present();
@@ -84,7 +91,6 @@ function Profile() {
 
     return () => unsubscribe();
   }, []);
-
 
   useEffect(() => {
     const fetchUserDataAndPosts = async () => {
@@ -221,8 +227,6 @@ function Profile() {
     }
   };
   
-  
-  
   const handleNameChange = (event: CustomEvent) => {
     setName(event.detail.value || '');
   };
@@ -247,7 +251,6 @@ function Profile() {
     }
   };
 
-
   const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
 
   function Save() {
@@ -255,7 +258,6 @@ function Profile() {
     modal.current?.dismiss('confirm');
   }
   
-
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
       setMessage(`Hello, ${ev.detail.data}!`);
@@ -310,20 +312,24 @@ function Profile() {
           <div className='container'>
             {posts.map((post) => (
               <PostCard
-                key={post.id}
-                data={{
-                  userName: users[post.userId]?.username || 'Unknown User',
-                  postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time',
-                  category: post.selectedCategory,
-                  postTitle: post.title,
-                  postContent: post.description,
-                  location: post.location,
-                  images: post.images || [],
-                }} />
-            ))}
-          </div>
+              key={post.id}
+              data={{
+                userName: users[post.userId]?.username || 'Unknown User',
+                postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time',
+                category: post.selectedCategory,
+                postTitle: post.title,
+                postContent: post.description,
+                location: post.location,
+                images: post.images || [],
+                postId: post.id, 
+                onEditClick: handleEditPostClick, 
+              }} />
+          ))}
+        </div>
         </IonGrid>
       </IonContent>
+
+      <EditPostModal isOpen={!!editPostId} postId={editPostId} onClose={() => setEditPostId(null)} />
 
       {/* Modal Section */}
       <IonModal ref={modal} trigger="open-modal" onWillDismiss={(ev) => onWillDismiss(ev)}>
@@ -371,8 +377,6 @@ function Profile() {
               <p style={{ fontSize: 'default' }}>Change Photo</p>
             </IonCol>
           </IonRow>
-
-
 
             <IonRow>
               <IonCol>
