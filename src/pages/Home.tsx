@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { IonContent, IonHeader, IonPage, IonToolbar, IonGrid, IonRow, IonAvatar, IonButton, IonIcon } from '@ionic/react';
 import { locationOutline, timeOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
-import logo from '../assets/img/app-logo.png';
 import '../assets/css/home.css';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
@@ -76,49 +75,18 @@ const Home: React.FC = () => {
       <IonContent>
         <main>
           {posts.map((post: any) => (
-            <div key={post.id} className="post">
-              <div className="user-info">
-                <IonAvatar className="avatar">
-                  <img alt="Silhouette of a person's head" src="https://ionicframework.com/docs/img/demos/avatar.svg" />
-                </IonAvatar>
-                <div className="user-details">
-                  <span className="user-name">{users[post.userId]?.username || 'Unknown User'}</span>
-                  <span className="post-time">{post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time'}</span>
-                </div>
-                <IonButton fill="clear" className="message-button" onClick={() => navigateToChat(users[post.userId]?.username)}>
-                  Message
-                </IonButton>
-              </div>
-              <div className="post-content">
-                <h3>{post.title}</h3>
-                <p>{post.description}</p>
-                <p>Category: {post.selectedCategory}</p>
-              </div>
-              <div className="post-details">
-                <div className="details-container">
-                  <p className='details'>
-                    <IonIcon icon={locationOutline} className='icon'/>{post.location} <IonIcon icon={timeOutline} className='icon'/> Expiration Date: {post.pickupTime}
-                  </p>
-                </div>
-              </div>
-              {post.images && post.images.length > 0 && (
-                <div className="post-image-container">
-                  <div className="image-container">
-                    <div className="horizontal-scroll">
-                      {post.images.map((image: string, index: number) => (
-                        <img
-                          key={index}
-                          src={image}
-                          alt={`Image ${index}`}
-                          className="post-image"
-                        />
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
+            <PostCard 
+              key={post.id}
+              data={{
+                userName: users[post.userId]?.username || 'Unknown User',
+                postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown Time',
+                category: post.selectedCategory,
+                postTitle: post.title,
+                postContent: post.description,
+                location: post.location,
+                images: post.images || []
+              }} /> 
+          ))};
         </main>
       </IonContent>
     </IonPage>
