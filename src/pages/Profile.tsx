@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar, IonAlert } from '@ionic/react';
+import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
-import { locationOutline, personOutline, createOutline, timeOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
+import { locationOutline, personOutline, createOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
@@ -29,8 +29,11 @@ interface UserData {
 function Profile() {
   const history = useHistory();
   const modal = useRef<HTMLIonModalElement>(null);
-  const input = useRef<HTMLIonInputElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const currentUser = firebase.auth().currentUser;
+  const [profilePhoto, setProfilePhoto] = useState<File | null>(null);
+  const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
+  
 
   const [user, setUser] = useState<firebase.User | null>(null);
   const [username, setUsername] = useState('');
@@ -61,6 +64,18 @@ function Profile() {
     setModalPassword('');
   };
 
+  useEffect(() => {
+    const fetchUserDataAndPosts = async () => {
+      // ... (existing code)
+
+      const userDoc = await firebase.firestore().collection('users').doc(user?.uid).get();
+      const profilePhotoUrl = userDoc.data()?.profilePhotoUrl || null;
+
+      setProfilePhotoUrl(profilePhotoUrl);
+    };
+
+    fetchUserDataAndPosts();
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = firebase.auth().onAuthStateChanged((user) => {
@@ -107,7 +122,6 @@ function Profile() {
   
               setPosts(sortedUserPosts);
   
-              // Update the users state with the fetched user data
               const usersSnapshot = await firebase.firestore().collection('users').get();
               const usersData: { [key: string]: UserData } = {};
               usersSnapshot.docs.forEach((doc) => {
@@ -128,12 +142,6 @@ function Profile() {
   
     fetchUserDataAndPosts();
   }, [user]);
-  
-  
-  
-  
-  
-  
 
   const validateEmail = (email: string) => {
     return email.match(
@@ -175,6 +183,46 @@ function Profile() {
     }
   };
 
+  const handleFileChange = (files: FileList | null) => {
+    if (files && files.length > 0) {
+      const selectedFile = files[0];
+
+      setProfilePhoto(selectedFile);
+    }
+  };
+  
+  const uploadPhotoToFirestore = async (file: File) => {
+    try {
+      const storageRef = firebase.storage().ref();
+      const fileRef = storageRef.child(`profile_photos/${user?.uid}`);
+      await fileRef.put(file);
+      const downloadUrl = await fileRef.getDownloadURL();
+  
+      await firebase.firestore().collection('users').doc(user?.uid).update({
+        profilePhotoUrl: downloadUrl,
+      });
+    } catch (error) {
+      console.error('Error uploading photo to Firestore:', error);
+    }
+  };
+  
+  const updateProfilePhoto = async () => {
+    if (profilePhoto && user) {
+      await uploadPhotoToFirestore(profilePhoto);
+      // After updating the profile photo in Firestore, fetch the updated user data
+      const updatedUserDoc = await firebase.firestore().collection('users').doc(user.uid).get();
+      const updatedProfilePhotoUrl = updatedUserDoc.data()?.profilePhotoUrl;
+      
+      // Update the local state with the new profile photo URL
+      setProfilePhoto(updatedProfilePhotoUrl);
+  
+      // You can optionally update other parts of your UI with the new photo
+      // ...
+    }
+  };
+  
+  
+  
   const handleNameChange = (event: CustomEvent) => {
     setName(event.detail.value || '');
   };
@@ -203,9 +251,10 @@ function Profile() {
   const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
 
   function Save() {
-    modal.current?.dismiss(input.current?.value, 'confirm');
-    
+    updateProfilePhoto();
+    modal.current?.dismiss('confirm');
   }
+  
 
   function onWillDismiss(ev: CustomEvent<OverlayEventDetail>) {
     if (ev.detail.role === 'confirm') {
@@ -236,9 +285,24 @@ function Profile() {
         <IonGrid style={{ overflowY: 'scroll', maxHeight: '100vh' }}>
           <IonRow>
             <IonCol class="ion-text-center">
-              <IonButton routerLink="/change-profile-photo" custom-large-button shape="round" size="large" className="white-text" style={{ width: '155px', height: '155px', padding: '10px' }}>
-                <IonIcon icon={personOutline} size='large' />
-              </IonButton>
+            <IonButton
+              onClick={() => fileInputRef.current?.click()}
+              custom-large-button
+              shape="round"
+              size="large"
+              className="white-text"
+              style={{ width: '155px', height: '155px', padding: '10px' }}
+            >
+              {profilePhotoUrl ? (
+                <img
+                  src={profilePhotoUrl}
+                  alt="Profile"
+                  style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+                />
+              ) : (
+                <IonIcon icon={personOutline} size="large" />
+              )}
+            </IonButton>
               <h1 style={{ fontSize: 'default', margin: '0' }}>{name || 'Unknown Name'}</h1>
               <span className="user-name">@{username || 'Unknown User'}</span>
             </IonCol>
@@ -277,22 +341,38 @@ function Profile() {
 
         <IonContent fullscreen>
           <IonGrid>
-            <IonRow>
-              <IonCol class="ion-text-center">
-                <IonButton
-                  routerLink="/change-profile-photo"
-                  custom-large-button
-                  shape="round"
-                  size="large"
-                  className="white-text"
-                  style={{ width: '155px', height: '155px', padding: '10px' }}>
-                  <IonIcon icon={personOutline} size='large' />
-                </IonButton>
-                <p style={{ fontSize: "default"}}>
-                  Change Photo
-                </p>
-              </IonCol>
-            </IonRow>
+          <IonRow>
+            <IonCol class="ion-text-center">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleFileChange(e.target.files)}
+                style={{ display: 'none' }}
+                ref={fileInputRef}
+              />
+              <IonButton
+                onClick={() => fileInputRef.current?.click()}
+                custom-large-button
+                shape="round"
+                size="large"
+                className="white-text"
+                style={{ width: '155px', height: '155px', padding: '10px' }}
+              >
+                {profilePhoto ? (
+                  <img
+                    src={URL.createObjectURL(profilePhoto)}
+                    alt="Profile"
+                    style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+                  />
+                ) : (
+                  <IonIcon icon={personOutline} size="large" />
+                )}
+              </IonButton>
+              <p style={{ fontSize: 'default' }}>Change Photo</p>
+            </IonCol>
+          </IonRow>
+
+
 
             <IonRow>
               <IonCol>
