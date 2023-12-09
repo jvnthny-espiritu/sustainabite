@@ -1,0 +1,11 @@
+.no-posts-container {
+    border: 1px solid #095e37;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    height: 150px; /* Adjust as needed */
+  } 
