@@ -255,8 +255,7 @@ function Profile() {
     try {
       await firebase.auth().signOut();
       console.log('naka log out ka na gago');
-      // Redirect to the start page after successful logout
-      history.push('/start'); // Update '/start' with the actual path of your start page
+      history.push('/start');
     } catch (error) {
       console.error('Error logging out:', error);
     }
@@ -349,9 +348,7 @@ function Profile() {
                     postContent: post.description,
                     location: post.location,
                     images: post.images || [],
-                    postId: post.id, 
-                    onEditClick: handleEditPostClick, 
-                    onDeleteClick:handleDeletePost,
+                    postId: post.id
                   }}
                 />
               ))

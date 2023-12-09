@@ -1,9 +1,8 @@
-// EditPostModal.tsx
-
 import React, { useState, useEffect } from 'react';
-import { IonModal, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonButton } from '@ionic/react';
+import { IonButtons,IonModal, IonLabel, IonHeader, IonToolbar, IonTitle, IonContent, IonGrid, IonRow, IonCol, IonButton, IonInput, IonItem, IonTextarea, IonSelect, IonSelectOption } from '@ionic/react';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
+import '../assets/css/editpost.css';
 
 interface EditPostModalProps {
   isOpen: boolean;
@@ -86,94 +85,83 @@ const EditPostModal: React.FC<EditPostModalProps> = ({ isOpen, postId, onClose }
     <IonModal isOpen={isOpen} onDidDismiss={onClose} className="edit-post-modal">
       <IonHeader className="edit-post-modal-header">
         <IonToolbar>
+          <IonButtons slot="start">
+            <IonButton onClick={handleCancel}>Cancel</IonButton>
+          </IonButtons>
           <IonTitle>Edit Post</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={handleSaveChanges}>Save</IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
 
-      <IonContent fullscreen className="edit-post-modal-content">
-        <form className="edit-post-modal-form">
-          <IonRow>
-            <IonCol>
-              <IonLabel className="edit-post-modal-label">Title</IonLabel>
-              <input
-                className="edit-post-modal-input"
-                type="text"
-                placeholder="Enter title"
-                value={editedData.title}
-                onChange={(e) => setEditedData({ ...editedData, title: e.target.value })}
-              />
-            </IonCol>
-          </IonRow>
+      <IonContent fullscreen className="edit-post-modal-content ion-text-center ion-content-fullscreen">
+      <form className="edit-post-modal-form">
+          <IonItem>
+            <IonLabel position="floating">Title</IonLabel>
+            <IonInput
+              value={editedData.title}
+              onIonChange={(e) => setEditedData({ ...editedData, title: e.detail.value! })}
+              placeholder="Enter title here"
+            />
+          </IonItem>
 
-          <IonRow>
-            <IonCol>
-              <IonLabel className="edit-post-modal-label">Category</IonLabel>
-              <input
-                className="edit-post-modal-input"
-                type="text"
-                placeholder="Enter category"
-                value={editedData.category}
-                onChange={(e) => setEditedData({ ...editedData, category: e.target.value })}
-              />
-            </IonCol>
-          </IonRow>
+          <IonItem>
+            <IonLabel position="floating">Category</IonLabel>
+            <IonSelect
+              value={editedData.category}
+              onIonChange={(e) => setEditedData({ ...editedData, category: e.detail.value! })}>
+              <IonSelectOption value="Excess/Extra Food">Excess/Extra Food</IonSelectOption>
+              <IonSelectOption value="Donation">Donation</IonSelectOption>
+              <IonSelectOption value="Expiry Soon">Expiry Soon</IonSelectOption>
+              <IonSelectOption value="Looking for Food">Looking for Food</IonSelectOption>
+            </IonSelect>
+          </IonItem>
 
-          <IonRow>
-            <IonCol>
-              <IonLabel className="edit-post-modal-label">Description</IonLabel>
-              <textarea
-                className="edit-post-modal-textarea"
-                placeholder="Enter description"
-                value={editedData.description}
-                onChange={(e) => setEditedData({ ...editedData, description: e.target.value })}
-              />
-            </IonCol>
-          </IonRow>
+          <IonItem>
+            <IonLabel position="floating">Description</IonLabel>
+            <IonTextarea
+              value={editedData.description}
+              onIonChange={(e) => setEditedData({ ...editedData, description: e.detail.value! })}
+              autoGrow
+              rows={5}
+              placeholder="Enter description here"
+            />
+          </IonItem>
 
-          <IonRow>
-            <IonCol>
-              <IonLabel className="edit-post-modal-label">Location</IonLabel>
-              <input
-                className="edit-post-modal-input"
-                type="text"
-                placeholder="Enter location"
-                value={editedData.location}
-                onChange={(e) => setEditedData({ ...editedData, location: e.target.value })}
-              />
-            </IonCol>
-          </IonRow>
+          <IonItem>
+            <IonLabel position="floating">Location</IonLabel>
+            <IonInput
+              value={editedData.location}
+              onIonChange={(e) => setEditedData({ ...editedData, location: e.detail.value! })}
+              placeholder="Enter location here"
+            />
+          </IonItem>
 
-          <IonRow>
-            <IonCol>
-              <IonLabel className="edit-post-modal-label">Upload Photos</IonLabel>
-              <input
-                className="edit-post-modal-image-upload"
-                type="file"
-                multiple
-                onChange={(e) => handleImageUpload(e.target.files)}
-              />
+          <IonItem>
+            <IonLabel>Upload Photos</IonLabel>
+            <label htmlFor="fileInput" className="custom-file-upload">
+              Choose File
+            </label>
+            <input
+              type="file"
+              id="fileInput"
+              accept="image/*"
+              onChange={(e) => handleImageUpload(e.target.files)}
+              multiple
+              style={{ display: 'none' }}
+            />
+          </IonItem>
+          <div className="photo-container">
               {editedData.images && editedData.images.length > 0 && (
-                <div className="edit-post-modal-image-preview">
+                <div className="photo-container">
                   {editedData.images.map((imageUrl, index) => (
-                    <img key={index} className="edit-post-modal-image" src={imageUrl} alt={`Image ${index}`} />
+                    <img key={index} className="photo-thumbnail" src={imageUrl} alt={`Image ${index}`} />
                   ))}
                 </div>
               )}
-            </IonCol>
-          </IonRow>
+            </div>
         </form>
-
-        <IonRow className="edit-post-modal-buttons">
-          <IonCol className="edit-post-modal-save-btn">
-            <IonButton onClick={handleSaveChanges}>Save Changes</IonButton>
-          </IonCol>
-
-          <IonCol className="edit-post-modal-cancel-btn">
-            <IonButton onClick={handleCancel} color="danger">
-              Cancel
-            </IonButton>
-          </IonCol>
-        </IonRow>
       </IonContent>
     </IonModal>
   );

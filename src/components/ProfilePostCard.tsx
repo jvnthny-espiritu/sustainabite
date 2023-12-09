@@ -14,8 +14,6 @@ interface PostCardProps {
     location: string;
     images: never[];
     postId: string;
-    onEditClick: (postId: string) => void;
-    onDeleteClick: (postId: string) => void;
   };
   children?: React.ReactNode;
 }
@@ -46,8 +44,6 @@ const PostCard: React.FC<PostCardProps> = ({ data }) =>  (
           </div>
         </div>
       )}
-      <IonButton onClick={() => data.onEditClick(data.postId)}>Edit</IonButton>
-      <IonButton onClick={() => data.onDeleteClick(data.postId)}>Delete</IonButton>
     </div>
   </div>
 );
