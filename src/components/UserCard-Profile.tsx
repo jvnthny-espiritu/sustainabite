@@ -3,19 +3,18 @@ import { IonAvatar, IonButton, IonIcon, IonActionSheet } from '@ionic/react';
 import { ellipsisVertical } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import EditPostModal from '../components/EditPost';
-import EditPost from './EditPostModal'; 
+import EditPostModal from './EditPost';
 
 interface UserCardProps {
   userName: string;
   postTime: string;
   category: string;
   postId: string;
+  onEditClick: () => void; // Add this prop for the edit click handler
 }
 
-const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postId }) => {
+const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEditClick }) => {
   const [showOptions, setShowOptions] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false); 
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const handleOptions = () => {
@@ -24,14 +23,6 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postI
 
   const handleDismiss = () => {
     setShowOptions(false);
-  };
-
-  const handleEditClick = () => {
-    setShowEditModal(true);
-  };
-
-  const handleEditModalClose = () => {
-    setShowEditModal(false);
   };
 
   useEffect(() => {
@@ -49,7 +40,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postI
     };
 
     fetchProfilePhoto();
-  }, []); 
+  }, []); // Empty dependency array to run the effect only once when the component mounts
 
 
   return (
@@ -66,43 +57,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postI
           <span className="post-time">{postTime}</span>
           <span className='category'>{category}</span>
         </div>
-        <IonButton fill="clear" className="message-button" onClick={handleOptions}>
-        <IonIcon aria-hidden="true" icon={ellipsisVertical} />
-      </IonButton>
 
-      <IonActionSheet
-        isOpen={showOptions}
-        onDidDismiss={handleDismiss}
-        header="Options"
-        buttons={[
-          {
-            text: 'Edit',
-            handler: () => {
-              handleEditClick();
-              setShowOptions(false);
-            },
-          },
-          {
-            text: 'Delete',
-            role: 'destructive',
-            handler: () => {
-              console.log('deleting on process');
-              setShowOptions(false); 
-            },
-          },
-          {
-            text: 'Cancel',
-            role: 'cancel',
-            handler: () => {
-              console.log('canceled');
-              setShowOptions(false); 
-            },
-          },
-        ]}
-      />
-
-      {/* Render the EditPostModal component */}
-      <EditPostModal isOpen={showEditModal} postId={postId} onClose={handleEditModalClose} />
     </div>
   );
 };
