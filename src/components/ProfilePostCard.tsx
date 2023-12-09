@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import UserCard from './UserCard-Profile';
 import PostDetails from './PostDetails';
-import { IonButton, IonIcon, IonAlert } from '@ionic/react';
-import { ellipsisVertical } from 'ionicons/icons';
+import { IonButton } from '@ionic/react';
 import '../assets/css/card.css';
 
 interface PostCardProps {
@@ -18,16 +17,14 @@ interface PostCardProps {
     onEditClick: (postId: string) => void;
     onDeleteClick: (postId: string) => void;
   };
-  children?: React.ReactNode; // Include the children prop
+  children?: React.ReactNode;
 }
 
 
 const PostCard: React.FC<PostCardProps> = ({ data }) =>  (
   <div className="card">
     <div className="post">
-      <UserCard userName={data.userName} postTime={data.postTime} category={data.category} postId={''} onEditClick={function () : void {
-        throw new Error('Function not implemented.');
-      } }/>
+      <UserCard userName={data.userName} postTime={data.postTime} category={data.category} postId={data.postId} />
       <div className="post-content">
         <h3>{data.postTitle}</h3>
         <p>{data.postContent}</p>

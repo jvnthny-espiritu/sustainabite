@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon } from '@ionic/react';
+import { IonButtons, IonCol, IonContent, IonGrid, IonRow, IonButton, IonModal, IonHeader, IonToolbar, IonTitle, IonPage, IonItem, IonInput, IonIcon, IonAvatar } from '@ionic/react';
 import { formatDistanceToNow } from 'date-fns';
 import { locationOutline, personOutline, createOutline, ellipsisVertical, logOutOutline } from 'ionicons/icons';
 import { useHistory } from 'react-router-dom';
@@ -303,13 +303,8 @@ function Profile() {
         <IonGrid style={{ overflowY: 'scroll', maxHeight: '100vh' }}>
           <IonRow>
             <IonCol class="ion-text-center">
-            <IonButton
-              onClick={() => fileInputRef.current?.click()}
-              custom-large-button
-              shape="round"
-              size="large"
-              className="white-text"
-              style={{ width: '155px', height: '155px', padding: '10px' }}
+            <IonAvatar
+              style={{ width: '200px', height: '200px', padding: '15px', margin:'auto' }}
             >
               {profilePhotoUrl ? (
                 <img
@@ -320,7 +315,7 @@ function Profile() {
               ) : (
                 <IonIcon icon={personOutline} size="large" />
               )}
-            </IonButton>
+            </IonAvatar>
               <h1 style={{ fontSize: 'default', margin: '0' }}>{name || 'Unknown Name'}</h1>
               <span className="user-name">@{username || 'Unknown User'}</span>
             </IonCol>
@@ -392,23 +387,20 @@ function Profile() {
                 style={{ display: 'none' }}
                 ref={fileInputRef}
               />
-              <IonButton
-                onClick={() => fileInputRef.current?.click()}
-                custom-large-button
-                shape="round"
-                size="large"
-                className="white-text"
-                style={{ width: '155px', height: '155px', padding: '10px' }}
-              >
-                {profilePhoto ? (
-                  <img
-                    src={URL.createObjectURL(profilePhoto)}
-                    alt="Profile"
-                    style={{ width: '100%', height: '100%', borderRadius: '50%' }}
-                  />
-                ) : (
-                  <IonIcon icon={personOutline} size="large" />
-                )}
+              <IonButton onClick={() => fileInputRef.current?.click()} shape="round" fill="clear">
+                <IonAvatar
+                  style={{ width: '200px', height: '200px', padding: '15px', margin:'auto' }}
+                >
+                  {profilePhotoUrl ? (
+                    <img
+                      src={profilePhotoUrl}
+                      alt="Profile"
+                      style={{ width: '100%', height: '100%', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    <IonIcon icon={personOutline} size="large" />
+                  )}
+                </IonAvatar>
               </IonButton>
               <p style={{ fontSize: 'default' }}>Change Photo</p>
             </IonCol>

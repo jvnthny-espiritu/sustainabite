@@ -1,5 +1,5 @@
 .card {
-  border: 1px solid #43b14b;
+  border: 1px solid #004225;
   margin-bottom: 1rem;
   padding: 1rem;
   border-radius: 10px;
@@ -14,14 +14,13 @@
   
 .avatar {
 	width: 40px;
-	height: auto;
+	height: 40px;
   margin-right: 1rem;
   }
 
 .user-details {
   display: flex;
   flex-direction: column;
-
   }
   
 .user-name {
@@ -36,18 +35,18 @@
 
 .category {
   width: fit-content;
-  color: #43b14b;
+  color: #004225;
   margin-top: 5px;
   padding: 0 10px;
   font-size: 11px;
-  border: 2px solid #43b14b;
+  border: 2px solid #004225;
   border-radius: 20px;
 }
 
 .message-button {
 	margin-left: auto;
 	border-style: none;
-	color: #43b14b;
+	color: #004225;
 	font-size: larger;
   }
 
@@ -57,7 +56,7 @@
 
 .details-container {
   background-color: transparent;
-  border:1px solid #43b14b;
+  border:1px solid #004225;
   padding:0px;
   padding-left:20px;
   border-radius: 10px; 
@@ -81,7 +80,7 @@
     height: 100%;
     object-fit: cover;
     margin: 10px 1.5px 0 1.5px;
-    border: 2px solid #43b14b;
+    border: 2px solid #004225;
     border-radius: 8px;
     vertical-align: top; 
   }
@@ -90,29 +89,4 @@
   display: flex;
   overflow-x: auto;
   white-space: nowrap;
-}
-
-@media (prefers-color-scheme: light) {
-  .card {
-    border: 1px solid #004225;
-  }
-
-  .category {
-    color: #004225;
-    border: 2px solid #004225;
-  }
-
-  .message-button {
-    color: #004225;
-    }
-
-  .details-container {
-    border:1px solid #004225;
-    }
-
-
-  .post-image {
-    border: 2px solid #004225;
-  }
-
 }

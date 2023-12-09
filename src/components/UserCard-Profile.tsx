@@ -4,7 +4,6 @@ import { ellipsisVertical } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
 import EditPostModal from '../components/EditPost';
-import EditPost from './EditPostModal'; 
 
 interface UserCardProps {
   userName: string;
@@ -85,10 +84,15 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postI
           {
             text: 'Delete',
             role: 'destructive',
-            handler: () => {
-              console.log('deleting on process');
-              setShowOptions(false); 
-            },
+            handler: async () => {
+              try {
+                await firebase.firestore().collection('posts').doc(postId).delete();
+                console.log('Post deleted successfully');
+              } catch (error) {
+                console.error('Error deleting post:', error);
+              setShowOptions(false);
+              }
+            }
           },
           {
             text: 'Cancel',
