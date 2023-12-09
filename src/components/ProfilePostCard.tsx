@@ -4,6 +4,7 @@ import PostDetails from './PostDetails';
 import { IonButton, IonIcon, IonAlert } from '@ionic/react';
 import { ellipsisVertical } from 'ionicons/icons';
 import '../assets/css/card.css';
+import { pencil, trash } from 'ionicons/icons'; 
 
 interface PostCardProps {
   data: {
@@ -49,8 +50,17 @@ const PostCard: React.FC<PostCardProps> = ({ data }) =>  (
           </div>
         </div>
       )}
-      <IonButton onClick={() => data.onEditClick(data.postId)}>Edit</IonButton>
-      <IonButton onClick={() => data.onDeleteClick(data.postId)}>Delete</IonButton>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <IonButton fill="clear" onClick={() => data.onEditClick(data.postId)}>
+          <IonIcon aria-hidden="true" icon={pencil} />
+          <span>Edit</span>
+        </IonButton>
+        <IonButton fill="clear" onClick={() => data.onDeleteClick(data.postId)}>
+          <IonIcon aria-hidden="true" icon={trash} />
+          <span>Delete</span>
+        </IonButton>
+      </div>
+
     </div>
   </div>
 );
