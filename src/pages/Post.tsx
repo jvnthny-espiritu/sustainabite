@@ -175,7 +175,7 @@ const Post: React.FC = () => {
                   onIonChange={(e) => setDescription(e.detail.value!)}
                   autoGrow
                   rows={5}
-                  placeholder="Enter details about the items"
+                  placeholder="Enter details about the post/items"
                   style={{ borderBottom: 'none' }}
                 />
               </IonItem>
