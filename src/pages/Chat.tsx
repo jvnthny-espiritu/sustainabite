@@ -9,8 +9,6 @@ import {getUsername } from '../services/getUsername';
 import { db } from '../firebase';
 
 const Chat: React.FC = () => {
-
-
   const history = useHistory();
   const user = getUsername(); // changes based on user
   const { recipient } = useParams<{ recipient: string }>(); //change based on recipient
