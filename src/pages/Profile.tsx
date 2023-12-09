@@ -9,6 +9,8 @@ import 'firebase/compat/firestore';
 import { OverlayEventDetail } from '@ionic/core/components';
 import PostCard from '../components/ProfilePostCard';
 import EditPostModal from '../components/EditPost';
+import '../assets/css/profile.css';
+
 
 
 interface PostData {
@@ -260,6 +262,11 @@ function Profile() {
     }
   };
 
+  const handleCreatePostClick = () => {
+    history.push('/Post');
+  };
+
+
   const [message, setMessage] = useState('This modal example uses triggers to automatically open a modal when the button is clicked.');
 
   function Save() {
@@ -319,23 +326,42 @@ function Profile() {
             </IonCol>
           </IonRow>
           <div className='container'>
-            {posts.map((post) => (
-              <PostCard
-              key={post.id}
-              data={{
-                userName: users[post.userId]?.username || 'Unknown User',
-                postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time',
-                category: post.selectedCategory,
-                postTitle: post.title,
-                postContent: post.description,
-                location: post.location,
-                images: post.images || [],
-                postId: post.id, 
-                onEditClick: handleEditPostClick, 
-                onDeleteClick:handleDeletePost,
-              }} />
-          ))}
-        </div>
+          {posts.length === 0 ? (
+            <div className="no-posts-container">
+              <p className="no-posts-message">No posts available</p>
+              <IonRow>
+                <IonCol>
+                  <IonButton
+                    onClick={handleCreatePostClick}
+                    expand="full"
+                    className="create-post-button"
+                    shape='round'
+                  >
+                    Create Post
+                  </IonButton>
+                </IonCol>
+              </IonRow>
+            </div>
+            ) : (
+              posts.map((post) => (
+                <PostCard
+                  key={post.id}
+                  data={{
+                    userName: users[post.userId]?.username || 'Unknown User',
+                    postTime: post.postedAt ? formatDistanceToNow(new Date(post.postedAt)) : 'Unknown time',
+                    category: post.selectedCategory,
+                    postTitle: post.title,
+                    postContent: post.description,
+                    location: post.location,
+                    images: post.images || [],
+                    postId: post.id, 
+                    onEditClick: handleEditPostClick, 
+                    onDeleteClick:handleDeletePost,
+                  }}
+                />
+              ))
+            )}
+          </div>
         </IonGrid>
       </IonContent>
 
