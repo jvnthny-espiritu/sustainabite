@@ -3,18 +3,19 @@ import { IonAvatar, IonButton, IonIcon, IonActionSheet } from '@ionic/react';
 import { ellipsisVertical } from 'ionicons/icons';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import EditPostModal from './EditPost';
+import EditPostModal from '../components/EditPost';
+import EditPost from './EditPostModal'; 
 
 interface UserCardProps {
   userName: string;
   postTime: string;
   category: string;
   postId: string;
-  onEditClick: () => void; // Add this prop for the edit click handler
 }
 
-const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEditClick }) => {
+const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, postId }) => {
   const [showOptions, setShowOptions] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false); 
   const [profilePhotoUrl, setProfilePhotoUrl] = useState<string | null>(null);
 
   const handleOptions = () => {
@@ -23,6 +24,14 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEdi
 
   const handleDismiss = () => {
     setShowOptions(false);
+  };
+
+  const handleEditClick = () => {
+    setShowEditModal(true);
+  };
+
+  const handleEditModalClose = () => {
+    setShowEditModal(false);
   };
 
   useEffect(() => {
@@ -40,7 +49,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEdi
     };
 
     fetchProfilePhoto();
-  }, []); // Empty dependency array to run the effect only once when the component mounts
+  }, []); 
 
 
   return (
@@ -69,8 +78,8 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEdi
           {
             text: 'Edit',
             handler: () => {
-              onEditClick(); // Trigger the edit click handler
-              setShowOptions(false); // Close the action sheet
+              handleEditClick();
+              setShowOptions(false);
             },
           },
           {
@@ -78,7 +87,7 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEdi
             role: 'destructive',
             handler: () => {
               console.log('deleting on process');
-              setShowOptions(false); // Close the action sheet
+              setShowOptions(false); 
             },
           },
           {
@@ -86,11 +95,14 @@ const UserCard: React.FC<UserCardProps> = ({ userName, postTime, category, onEdi
             role: 'cancel',
             handler: () => {
               console.log('canceled');
-              setShowOptions(false); // Close the action sheet
+              setShowOptions(false); 
             },
           },
         ]}
       />
+
+      {/* Render the EditPostModal component */}
+      <EditPostModal isOpen={showEditModal} postId={postId} onClose={handleEditModalClose} />
     </div>
   );
 };
